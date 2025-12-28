@@ -1,4 +1,4 @@
-package woobl0g.userservice.global.config;
+package woobl0g.boardservice.global.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -12,7 +12,7 @@ public class SwaggerConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("Woobl0g")
-                        .description("user-service")
+                        .description("board-service")
                         .version("1.0.0")
                 );
     }

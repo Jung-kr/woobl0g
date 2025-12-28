@@ -3,7 +3,7 @@ spring:
     activate:
       on-profile: local
   datasource:
-    url: jdbc:mysql://localhost:3307/user-db
+    url: jdbc:mysql://localhost:3308/board-db
     username: root
     password: 1234
   jpa:
