@@ -1,0 +1,24 @@
+services:
+  user-db:
+    image: mysql:8.0
+    container_name: woobl0g-user-db
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+    ports:
+      - '3307:3306'
+
+  board-db:
+    image: mysql:8.0
+    container_name: woobl0g-board-db
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+    ports:
+      - '3308:3306'
+
+  point-db:
+    image: mysql:8.0
+    container_name: woobl0g-point-db
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+    ports:
+      - '3309:3306'
