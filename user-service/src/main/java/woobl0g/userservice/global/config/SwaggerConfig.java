@@ -11,8 +11,8 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Woobl0g User Service")
-                        .description("Woobl0g User Service")
+                        .title("Woobl0g")
+                        .description("user-service")
                         .version("1.0.0")
                 );
     }
