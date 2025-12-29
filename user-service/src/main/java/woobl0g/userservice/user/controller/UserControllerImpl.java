@@ -3,13 +3,11 @@ package woobl0g.userservice.user.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import woobl0g.userservice.global.response.ApiResponse;
 import woobl0g.userservice.global.response.ResponseCode;
 import woobl0g.userservice.user.dto.SignUpRequestDto;
+import woobl0g.userservice.user.dto.UserResponseDto;
 import woobl0g.userservice.user.service.UserService;
 
 @RestController
@@ -26,5 +24,12 @@ public class UserControllerImpl implements UserController {
         return ResponseEntity
                 .status(ResponseCode.SIGN_UP_SUCCESS.getStatus())
                 .body(ApiResponse.success(ResponseCode.SIGN_UP_SUCCESS));
+    }
+
+    @GetMapping("{userId}")
+    public ResponseEntity<ApiResponse<UserResponseDto>> getUser(@PathVariable Long userId) {
+        return ResponseEntity
+                .status(ResponseCode.USER_GET_SUCCESS.getStatus())
+                .body(ApiResponse.success(ResponseCode.USER_GET_SUCCESS, userService.getUser(userId)));
     }
 }
