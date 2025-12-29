@@ -1,0 +1,36 @@
+package woobl0g.boardservice.board.domain;
+
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "boards")
+public class Board {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long boardId;
+    private String title;
+    private String content;
+    private Long userId;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    private Board(String title, String content, Long userId) {
+        this.title = title;
+        this.content = content;
+        this.userId = userId;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public static Board create(String title, String content, Long userId) {
+        return new Board(title, content, userId);
+    }
+}
