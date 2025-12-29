@@ -10,3 +10,7 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: false
+
+client:
+  user-service:
+    url: ${USER_SERVICE_URL}
