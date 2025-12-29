@@ -21,7 +21,7 @@ public class UserClient {
 
     public UserResponseDto fetchUser(Long userId) {
         return restClient.get()
-                    .uri("/api/users/{userId}", userId)
+                    .uri("/internal/users/{userId}", userId)
                     .retrieve()
                     .body(UserResponseDto.class);
 
