@@ -2,13 +2,12 @@ package woobl0g.userservice.user.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import woobl0g.userservice.global.response.ResponseCode;
 import woobl0g.userservice.user.dto.UserResponseDto;
 import woobl0g.userservice.user.service.UserService;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,5 +22,12 @@ public class UserInternalControllerImpl implements UserInternalController {
         return ResponseEntity
                 .status(ResponseCode.USER_GET_SUCCESS.getStatus())
                 .body(userService.getUser(userId));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserResponseDto>> getAllUsers(@RequestParam List<Long> userIds) {
+        return ResponseEntity
+                .status(ResponseCode.USER_GET_SUCCESS.getStatus())
+                .body(userService.getUsers(userIds));
     }
 }

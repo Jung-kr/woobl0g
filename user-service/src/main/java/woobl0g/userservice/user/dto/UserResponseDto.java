@@ -8,10 +8,11 @@ import woobl0g.userservice.user.domain.User;
 @AllArgsConstructor
 public class UserResponseDto {
 
+    private Long userId;
     private String email;
     private String name;
 
     public static UserResponseDto from(User user) {
-        return new UserResponseDto(user.getEmail(),  user.getName());
+        return new UserResponseDto(user.getUserId(), user.getEmail(),  user.getName());
     }
 }
