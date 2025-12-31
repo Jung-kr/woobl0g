@@ -12,8 +12,12 @@ public enum ResponseCode {
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
     DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "이미 사용 중인 이메일입니다."),
 
+    // 404 NOT FOUND
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
+
     //200 OK
     HEALTH_CHECK_SUCCESS(HttpStatus.OK, "서비스가 정상적으로 동작 중입니다."),
+    USER_GET_SUCCESS(HttpStatus.OK, "사용자 조회에 성공했습니다."),
 
     // 201 CREATED
     SIGN_UP_SUCCESS(HttpStatus.CREATED, "회원가입이 완료되었습니다.");

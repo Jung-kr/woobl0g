@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import woobl0g.userservice.global.response.ApiResponse;
 import woobl0g.userservice.user.dto.SignUpRequestDto;
 
-@Tag(name = "User", description = "회원 관련 API")
+@Tag(name = "User", description = "회원 관련 외부용 API")
 public interface UserController {
 
     @Operation(
