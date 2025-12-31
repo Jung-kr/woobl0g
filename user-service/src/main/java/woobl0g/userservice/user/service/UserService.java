@@ -7,6 +7,7 @@ import woobl0g.userservice.global.exception.UserException;
 import woobl0g.userservice.global.response.ResponseCode;
 import woobl0g.userservice.user.client.PointClient;
 import woobl0g.userservice.user.domain.User;
+import woobl0g.userservice.user.dto.AddActivityScoreRequestDto;
 import woobl0g.userservice.user.dto.SignUpRequestDto;
 import woobl0g.userservice.user.dto.UserResponseDto;
 import woobl0g.userservice.user.repository.UserRepository;
@@ -53,5 +54,14 @@ public class UserService {
                         user.getName()
                 ))
                 .toList();
+    }
+
+    @Transactional
+    public void addActivityScore(AddActivityScoreRequestDto addActivityScoreRequestDto) {
+
+        User user = userRepository.findById(addActivityScoreRequestDto.getUserId())
+                .orElseThrow(() -> new UserException(ResponseCode.USER_NOT_FOUND));
+
+        user.addActivityScore(addActivityScoreRequestDto.getActionType().getActivityScore());
     }
 }
