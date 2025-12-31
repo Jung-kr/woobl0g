@@ -10,6 +10,8 @@ import woobl0g.boardservice.board.service.BoardService;
 import woobl0g.boardservice.global.response.ApiResponse;
 import woobl0g.boardservice.global.response.ResponseCode;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/boards")
 @RequiredArgsConstructor
@@ -31,5 +33,12 @@ public class BoardControllerImpl implements BoardController {
         return ResponseEntity
                 .status(ResponseCode.BOARD_GET_SUCCESS.getStatus())
                 .body(ApiResponse.success(ResponseCode.BOARD_GET_SUCCESS, boardService.getBoard(boardId)));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<BoardResponseDto>>> getBoards() {
+        return ResponseEntity
+                .status(ResponseCode.BOARD_GET_SUCCESS.getStatus())
+                .body(ApiResponse.success(ResponseCode.BOARD_GET_SUCCESS, boardService.getBoards()));
     }
 }

@@ -9,5 +9,5 @@ public class BoardResponseDto {
 
     private String title;
     private String content;
-    private UserDto user;
+    private UserInfoDto user;
 }
