@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import woobl0g.boardservice.board.dto.AddPointsRequestDto;
 import woobl0g.boardservice.board.dto.DeductPointsRequestDto;
 
 @Slf4j
@@ -24,6 +25,15 @@ public class PointClient {
                 .uri("/internal/points/deduct")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new DeductPointsRequestDto(userId, actionType))
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    public void addPoints(Long userId, String actionType) {
+        restClient.post()
+                .uri("/internal/points/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new AddPointsRequestDto(userId, actionType))
                 .retrieve()
                 .toBodilessEntity();
     }
