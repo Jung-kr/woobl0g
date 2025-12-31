@@ -3,6 +3,7 @@ package woobl0g.boardservice.board.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import woobl0g.boardservice.board.client.PointClient;
 import woobl0g.boardservice.board.client.UserClient;
 import woobl0g.boardservice.board.domain.Board;
 import woobl0g.boardservice.board.dto.BoardResponseDto;
@@ -21,13 +22,21 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class BoardService {
 
-    private final BoardRepository boardRepository;
     private final UserClient userClient;
+    private final PointClient pointClient;
+    private final BoardRepository boardRepository;
 
     @Transactional
     public void create(CreateBoardRequestDto dto) {
+        // 게시글 작성 전 10 포인트 차감
+        pointClient.deductPoints(dto.getUserId(), "BOARD_CREATE");
+
+        // 게시글 작성
         Board board = Board.create(dto.getTitle(), dto.getContent(), dto.getUserId());
         boardRepository.save(board);
+
+        // 게시글 작성 시 활동 점수 10점 부여
+        userClient.addActivityScore(dto.getUserId(), "BOARD_CREATE");
     }
 
     @Transactional(readOnly = true)

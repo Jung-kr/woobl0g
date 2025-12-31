@@ -3,9 +3,11 @@ package woobl0g.boardservice.board.client;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import woobl0g.boardservice.board.dto.AddActivityScoreRequestDto;
 import woobl0g.boardservice.board.dto.UserResponseDto;
 
 import java.util.Collections;
@@ -53,5 +55,14 @@ public class UserClient {
             log.error("사용자 정보 조회 실패: {}", e.getMessage(), e);
             return Collections.emptyList();
         }
+    }
+
+    public void addActivityScore(Long userId, String actionType) {
+        restClient.post()
+                .uri("/internal/users/score/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new AddActivityScoreRequestDto(userId, actionType))
+                .retrieve()
+                .toBodilessEntity();
     }
 }

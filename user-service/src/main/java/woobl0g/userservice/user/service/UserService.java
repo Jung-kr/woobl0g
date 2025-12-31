@@ -5,7 +5,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import woobl0g.userservice.global.exception.UserException;
 import woobl0g.userservice.global.response.ResponseCode;
+import woobl0g.userservice.user.client.PointClient;
 import woobl0g.userservice.user.domain.User;
+import woobl0g.userservice.user.dto.AddActivityScoreRequestDto;
 import woobl0g.userservice.user.dto.SignUpRequestDto;
 import woobl0g.userservice.user.dto.UserResponseDto;
 import woobl0g.userservice.user.repository.UserRepository;
@@ -16,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
 
+    private final PointClient pointClient;
     private final UserRepository userRepository;
 
     @Transactional
@@ -26,7 +29,9 @@ public class UserService {
         }
 
         User user = User.create(dto.getEmail(), dto.getName(), dto.getPassword());
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        pointClient.addPoints(savedUser.getUserId(), "SIGN_UP");
     }
 
     @Transactional(readOnly = true)
@@ -49,5 +54,14 @@ public class UserService {
                         user.getName()
                 ))
                 .toList();
+    }
+
+    @Transactional
+    public void addActivityScore(AddActivityScoreRequestDto addActivityScoreRequestDto) {
+
+        User user = userRepository.findById(addActivityScoreRequestDto.getUserId())
+                .orElseThrow(() -> new UserException(ResponseCode.USER_NOT_FOUND));
+
+        user.addActivityScore(addActivityScoreRequestDto.getActionType().getActivityScore());
     }
 }
