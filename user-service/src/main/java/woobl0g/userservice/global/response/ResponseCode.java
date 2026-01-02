@@ -21,7 +21,10 @@ public enum ResponseCode {
     SCORE_ADD_SUCCESS(HttpStatus.NO_CONTENT, "활동 점수 적립이 완료되었습니다."),
 
     // 201 CREATED
-    SIGN_UP_SUCCESS(HttpStatus.CREATED, "회원가입이 완료되었습니다.");
+    SIGN_UP_SUCCESS(HttpStatus.CREATED, "회원가입이 완료되었습니다."),
+
+    // 500 INTERNAL SERVER ERROR
+    JSON_DESERIALIZATION_FAILED(HttpStatus.BAD_REQUEST, "JSON 역직렬화에 실패했습니다.");
 
     private final HttpStatus status;
     private final String message;

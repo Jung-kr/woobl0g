@@ -1,7 +1,10 @@
 package woobl0g.boardservice.board.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import woobl0g.boardservice.board.client.PointClient;
@@ -11,6 +14,7 @@ import woobl0g.boardservice.board.dto.BoardResponseDto;
 import woobl0g.boardservice.board.dto.CreateBoardRequestDto;
 import woobl0g.boardservice.board.dto.UserInfoDto;
 import woobl0g.boardservice.board.dto.UserResponseDto;
+import woobl0g.boardservice.board.event.BoardCreatedEvent;
 import woobl0g.boardservice.board.repository.BoardRepository;
 import woobl0g.boardservice.global.exception.BoardException;
 import woobl0g.boardservice.global.response.ResponseCode;
@@ -27,6 +31,7 @@ public class BoardService {
     private final UserClient userClient;
     private final PointClient pointClient;
     private final BoardRepository boardRepository;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     public void create(CreateBoardRequestDto dto) {
 
@@ -50,8 +55,11 @@ public class BoardService {
             log.info("[게시글 생성] 게시글 저장 성공 - boardId = {}", savedBoardId);
 
             // 게시글 작성 시 활동 점수 10점 부여
-            userClient.addActivityScore(dto.getUserId(), "BOARD_CREATE");
-            log.info("[게시글 생성] 활동 점수 적립 성공 - userId = {}", savedBoardId);
+//            userClient.addActivityScore(dto.getUserId(), "BOARD_CREATE");
+//            log.info("[게시글 생성] 활동 점수 적립 성공 - userId = {}", savedBoardId);
+
+            BoardCreatedEvent boardCreatedEvent = new BoardCreatedEvent(dto.getUserId(), "BOARD_CREATE");
+            kafkaTemplate.send("board.created", boardCreatedEvent.toJson());
         } catch (Exception e) {
             log.error("[게시글 생성 실패] - userId = {}", savedBoardId, e);
             if(isBoardCreated) {
