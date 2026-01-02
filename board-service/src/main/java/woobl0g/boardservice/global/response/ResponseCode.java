@@ -23,7 +23,8 @@ public enum ResponseCode {
     BOARD_CREATED(HttpStatus.CREATED, "게시글이 생성되었습니다."),
 
     // 500 INTERNAL SERVER ERROR
-    BOARD_CREATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "게시글 생성에 실패했습니다.");
+    BOARD_CREATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "게시글 생성에 실패했습니다."),
+    JSON_SERIALIZATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "JSON 직렬화에 실패했습니다.");
 
     private final HttpStatus status;
     private final String message;

@@ -31,7 +31,7 @@ public class BoardService {
     private final UserClient userClient;
     private final PointClient pointClient;
     private final BoardRepository boardRepository;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     public void create(CreateBoardRequestDto dto) {
 
@@ -56,10 +56,10 @@ public class BoardService {
 
             // 게시글 작성 시 활동 점수 10점 부여
 //            userClient.addActivityScore(dto.getUserId(), "BOARD_CREATE");
+//            log.info("[게시글 생성] 활동 점수 적립 성공 - userId = {}", savedBoardId);
 
-            BoardCreatedEvent boardCreatedEvent = new BoardCreatedEvent(dto.getUserId());
-            kafkaTemplate.send("board.created", boardCreatedEvent);
-            log.info("[게시글 생성] 활동 점수 적립 성공 - userId = {}", savedBoardId);
+            BoardCreatedEvent boardCreatedEvent = new BoardCreatedEvent(dto.getUserId(), "BOARD_CREATE");
+            kafkaTemplate.send("board.created", boardCreatedEvent.toJson());
         } catch (Exception e) {
             log.error("[게시글 생성 실패] - userId = {}", savedBoardId, e);
             if(isBoardCreated) {
@@ -76,19 +76,6 @@ public class BoardService {
             throw new BoardException(ResponseCode.BOARD_CREATE_FAILED);
         }
     }
-
-//    // 객체를 Json 형태의 String으로 만들어주는 메서드
-//    // (클래스로 분리하면 더 좋지만 편의를 위해 메서드로만 분리)
-//    private String toJsonString(Object object) {
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        try {
-//            String message = objectMapper.writeValueAsString(object);
-//            return message;
-//        } catch (JsonProcessingException e) {
-//            throw new RuntimeException("Json 직렬화 실패");
-//        }
-//    }
-
 
     @Transactional(readOnly = true)
     public BoardResponseDto getBoard(Long boardId) {
