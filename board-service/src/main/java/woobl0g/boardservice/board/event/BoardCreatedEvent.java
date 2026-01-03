@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import woobl0g.boardservice.global.exception.JsonSerializationException;
+import woobl0g.boardservice.global.exception.JsonConversionException;
 import woobl0g.boardservice.global.response.ResponseCode;
 
 @Getter
@@ -19,7 +19,7 @@ public class BoardCreatedEvent {
         try {
             return objectMapper.writeValueAsString(this);
         } catch (JsonProcessingException e) {
-            throw new JsonSerializationException(ResponseCode.JSON_SERIALIZATION_FAILED);
+            throw new JsonConversionException(ResponseCode.JSON_SERIALIZATION_FAILED);
         }
     }
 }
