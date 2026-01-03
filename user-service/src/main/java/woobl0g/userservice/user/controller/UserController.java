@@ -10,7 +10,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import woobl0g.userservice.global.response.ApiResponse;
+import woobl0g.userservice.user.dto.ActivityScoreHistoryResponseDto;
 import woobl0g.userservice.user.dto.SignUpRequestDto;
+import woobl0g.userservice.user.dto.UserRankingResponseDto;
+
+import java.util.List;
 
 @Tag(name = "User", description = "회원 관련 외부용 API")
 public interface UserController {
