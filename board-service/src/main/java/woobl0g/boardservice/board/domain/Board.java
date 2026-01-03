@@ -18,9 +18,15 @@ public class Board {
     private Long boardId;
     private String title;
     private String content;
-    private Long userId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    private User user;
+
+    @Column(name = "user_id")
+    private Long userId;
 
     private Board(String title, String content, Long userId) {
         this.title = title;

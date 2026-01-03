@@ -115,4 +115,32 @@ public class BoardService {
                 ))
                 .toList();
     }
+
+    public BoardResponseDto getBoard2(Long boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new BoardException(ResponseCode.BOARD_NOT_FOUND));
+
+        UserInfoDto userInfoDto = new UserInfoDto(board.getUser().getEmail(), board.getUser().getName());
+
+        return new BoardResponseDto(
+                board.getTitle(),
+                board.getContent(),
+                userInfoDto
+        );
+    }
+
+    public List<BoardResponseDto> getBoards2() {
+        List<Board> boards = boardRepository.findAll();
+
+        return boards.stream()
+                .map(board -> new BoardResponseDto(
+                        board.getTitle(),
+                        board.getContent(),
+                        new UserInfoDto(
+                                board.getUser().getEmail(),
+                                board.getUser().getName()
+                        )
+                ))
+                .toList();
+    }
 }
