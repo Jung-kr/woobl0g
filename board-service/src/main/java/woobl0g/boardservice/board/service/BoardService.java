@@ -85,7 +85,7 @@ public class BoardService {
                 .map(dto -> new UserInfoDto(dto.getEmail(), dto.getName()))
                 .orElse(null);
 
-        return new BoardResponseDto(board.getTitle(), board.getContent(), userInfoDto);
+        return new BoardResponseDto(board.getBoardId(), board.getTitle(), board.getContent(), userInfoDto);
     }
 
     @Transactional(readOnly = true)
@@ -109,6 +109,7 @@ public class BoardService {
 
         return boards.stream()
                 .map(board -> new BoardResponseDto(
+                        board.getBoardId(),
                         board.getTitle(),
                         board.getContent(),
                         userInfoMap.get(board.getUserId())
@@ -116,6 +117,7 @@ public class BoardService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public BoardResponseDto getBoard2(Long boardId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardException(ResponseCode.BOARD_NOT_FOUND));
@@ -123,17 +125,20 @@ public class BoardService {
         UserInfoDto userInfoDto = new UserInfoDto(board.getUser().getEmail(), board.getUser().getName());
 
         return new BoardResponseDto(
+                board.getBoardId(),
                 board.getTitle(),
                 board.getContent(),
                 userInfoDto
         );
     }
 
+    @Transactional(readOnly = true)
     public List<BoardResponseDto> getBoards2() {
         List<Board> boards = boardRepository.findAll();
 
         return boards.stream()
                 .map(board -> new BoardResponseDto(
+                        board.getBoardId(),
                         board.getTitle(),
                         board.getContent(),
                         new UserInfoDto(
