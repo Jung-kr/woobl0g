@@ -10,6 +10,7 @@ public enum ResponseCode {
 
     // 200 OK
     HEALTH_CHECK_SUCCESS(HttpStatus.OK, "서비스가 정상적으로 동작 중입니다."),
+    POINT_HISTORY_GET_SUCCESS(HttpStatus.OK, "포인트 이력 조회에 성공했습니다."),
 
     // 204 No Content
     POINT_DEDUCT_SUCCESS(HttpStatus.NO_CONTENT, "포인트 차감이 완료되었습니다."),
