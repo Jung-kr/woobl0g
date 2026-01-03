@@ -24,7 +24,8 @@ public enum ResponseCode {
     SIGN_UP_SUCCESS(HttpStatus.CREATED, "회원가입이 완료되었습니다."),
 
     // 500 INTERNAL SERVER ERROR
-    JSON_DESERIALIZATION_FAILED(HttpStatus.BAD_REQUEST, "JSON 역직렬화에 실패했습니다.");
+    JSON_DESERIALIZATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "JSON 역직렬화에 실패했습니다."),
+    JSON_SERIALIZATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "JSON 직렬화에 실패했습니다.");
 
     private final HttpStatus status;
     private final String message;

@@ -1,6 +1,7 @@
 package woobl0g.userservice.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import woobl0g.userservice.global.exception.UserException;
@@ -10,6 +11,7 @@ import woobl0g.userservice.user.domain.User;
 import woobl0g.userservice.user.dto.AddActivityScoreRequestDto;
 import woobl0g.userservice.user.dto.SignUpRequestDto;
 import woobl0g.userservice.user.dto.UserResponseDto;
+import woobl0g.userservice.user.event.UserSignedUpEvent;
 import woobl0g.userservice.user.repository.UserRepository;
 
 import java.util.List;
@@ -20,6 +22,7 @@ public class UserService {
 
     private final PointClient pointClient;
     private final UserRepository userRepository;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Transactional
     public void signUp(SignUpRequestDto dto) {
@@ -31,7 +34,12 @@ public class UserService {
         User user = User.create(dto.getEmail(), dto.getName(), dto.getPassword());
         User savedUser = userRepository.save(user);
 
+        // 회원가입시 포인트 적립
         pointClient.addPoints(savedUser.getUserId(), "SIGN_UP");
+
+        // 회원가입 이벤트 발행 -> board-service에 사용자 데이터 동기화 위함
+        UserSignedUpEvent userSignedUpEvent = new UserSignedUpEvent(savedUser.getUserId(), savedUser.getName(), savedUser.getEmail());
+        kafkaTemplate.send("user.signed-up", userSignedUpEvent.toJson());
     }
 
     @Transactional(readOnly = true)
