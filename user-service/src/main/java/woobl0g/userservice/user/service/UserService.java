@@ -1,6 +1,7 @@
 package woobl0g.userservice.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,10 +12,15 @@ import woobl0g.userservice.user.domain.User;
 import woobl0g.userservice.user.dto.AddActivityScoreRequestDto;
 import woobl0g.userservice.user.dto.SignUpRequestDto;
 import woobl0g.userservice.user.dto.UserResponseDto;
+import woobl0g.userservice.user.dto.UserRankingResponseDto;
 import woobl0g.userservice.user.event.UserSignedUpEvent;
+import woobl0g.userservice.user.domain.ActivityScoreHistory;
+import woobl0g.userservice.user.dto.ActivityScoreHistoryResponseDto;
+import woobl0g.userservice.user.repository.ActivityScoreHistoryRepository;
 import woobl0g.userservice.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +28,7 @@ public class UserService {
 
     private final PointClient pointClient;
     private final UserRepository userRepository;
+    private final ActivityScoreHistoryRepository activityScoreHistoryRepository;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Transactional
@@ -70,6 +77,41 @@ public class UserService {
         User user = userRepository.findById(addActivityScoreRequestDto.getUserId())
                 .orElseThrow(() -> new UserException(ResponseCode.USER_NOT_FOUND));
 
-        user.addActivityScore(addActivityScoreRequestDto.getActionType().getActivityScore());
+        int scoreChange = addActivityScoreRequestDto.getActionType().getActivityScore();
+        String reason = addActivityScoreRequestDto.getActionType().name();
+
+        user.addActivityScore(scoreChange);
+
+        // 활동 점수 기록 저장
+        ActivityScoreHistory history = ActivityScoreHistory.create(
+                user.getUserId(),
+                scoreChange,
+                reason
+        );
+        activityScoreHistoryRepository.save(history);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ActivityScoreHistoryResponseDto> getActivityScoreHistory(Long userId) {
+
+        if (!userRepository.existsById(userId)) {
+            throw new UserException(ResponseCode.USER_NOT_FOUND);
+        }
+
+        List<ActivityScoreHistory> histories = activityScoreHistoryRepository.findByUserIdOrderByCreatedAtDesc(userId);
+
+        return histories.stream()
+                .map(ActivityScoreHistoryResponseDto::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserRankingResponseDto> getTopRanking() {
+
+        List<User> topUsers = userRepository.findAllByOrderByActivityScoreDesc(PageRequest.of(0, 10));
+
+        return IntStream.range(0, topUsers.size())
+                .mapToObj(i -> UserRankingResponseDto.of(i + 1, topUsers.get(i)))
+                .toList();
     }
 }

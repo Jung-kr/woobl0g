@@ -10,7 +10,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import woobl0g.userservice.global.response.ApiResponse;
+import woobl0g.userservice.user.dto.ActivityScoreHistoryResponseDto;
 import woobl0g.userservice.user.dto.SignUpRequestDto;
+import woobl0g.userservice.user.dto.UserRankingResponseDto;
+
+import java.util.List;
 
 @Tag(name = "User", description = "회원 관련 외부용 API")
 public interface UserController {
@@ -48,5 +52,48 @@ public interface UserController {
             )
             @Valid @RequestBody SignUpRequestDto dto
     );
+
+    @Operation(
+            summary = "활동 점수 이력 조회",
+            description = "특정 사용자의 활동 점수 변동 이력을 최신순으로 조회합니다."
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "⭕ 조회 성공",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiResponse.class)
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "❌ 사용자를 찾을 수 없음",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiResponse.class)
+                    )
+            )
+    })
+    ResponseEntity<ApiResponse<List<ActivityScoreHistoryResponseDto>>> getActivityScoreHistory(
+            @io.swagger.v3.oas.annotations.Parameter(description = "사용자 ID", required = true)
+            Long userId
+    );
+
+    @Operation(
+            summary = "활동 점수 랭킹 조회",
+            description = "활동 점수 기준 상위 10명의 랭킹을 조회합니다."
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "⭕ 조회 성공",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiResponse.class)
+                    )
+            )
+    })
+    ResponseEntity<ApiResponse<List<UserRankingResponseDto>>> getTopRanking();
 
 }

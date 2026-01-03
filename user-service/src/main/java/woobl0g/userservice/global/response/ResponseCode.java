@@ -18,6 +18,8 @@ public enum ResponseCode {
     //200 OK
     HEALTH_CHECK_SUCCESS(HttpStatus.OK, "서비스가 정상적으로 동작 중입니다."),
     USER_GET_SUCCESS(HttpStatus.OK, "사용자 조회에 성공했습니다."),
+    ACTIVITY_SCORE_HISTORY_GET_SUCCESS(HttpStatus.OK, "활동 점수 이력 조회에 성공했습니다."),
+    RANKING_GET_SUCCESS(HttpStatus.OK, "랭킹 조회에 성공했습니다."),
     SCORE_ADD_SUCCESS(HttpStatus.NO_CONTENT, "활동 점수 적립이 완료되었습니다."),
 
     // 201 CREATED
