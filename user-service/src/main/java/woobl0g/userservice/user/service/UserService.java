@@ -70,6 +70,31 @@ public class UserService {
         User user = userRepository.findById(addActivityScoreRequestDto.getUserId())
                 .orElseThrow(() -> new UserException(ResponseCode.USER_NOT_FOUND));
 
-        user.addActivityScore(addActivityScoreRequestDto.getActionType().getActivityScore());
+        int scoreChange = addActivityScoreRequestDto.getActionType().getActivityScore();
+        String reason = addActivityScoreRequestDto.getActionType().name();
+
+        user.addActivityScore(scoreChange);
+
+        // 활동 점수 기록 저장
+        ActivityScoreHistory history = ActivityScoreHistory.create(
+                user.getUserId(),
+                scoreChange,
+                reason
+        );
+        activityScoreHistoryRepository.save(history);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ActivityScoreHistoryResponseDto> getActivityScoreHistory(Long userId) {
+
+        if (!userRepository.existsById(userId)) {
+            throw new UserException(ResponseCode.USER_NOT_FOUND);
+        }
+
+        List<ActivityScoreHistory> histories = activityScoreHistoryRepository.findByUserIdOrderByCreatedAtDesc(userId);
+
+        return histories.stream()
+                .map(ActivityScoreHistoryResponseDto::from)
+                .toList();
     }
 }
