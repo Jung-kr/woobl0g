@@ -11,17 +11,18 @@ import woobl0g.userservice.global.response.ResponseCode;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BoardCreatedEvent {
+public class UserSignedUpEvent {
 
     private Long userId;
-    private String actionType;
+    private String name;
+    private String email;
 
-    public static BoardCreatedEvent fromJson(String json) {
+    public String toJson() {
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(json, BoardCreatedEvent.class);
+            return objectMapper.writeValueAsString(this);
         } catch (JsonProcessingException e) {
-            throw new JsonConversionException(ResponseCode.JSON_DESERIALIZATION_FAILED);
+            throw new JsonConversionException(ResponseCode.JSON_SERIALIZATION_FAILED);
         }
     }
 }
