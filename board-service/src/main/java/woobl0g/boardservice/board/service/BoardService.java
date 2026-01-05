@@ -2,16 +2,15 @@ package woobl0g.boardservice.board.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import woobl0g.boardservice.board.client.PointClient;
 import woobl0g.boardservice.board.client.UserClient;
 import woobl0g.boardservice.board.domain.Board;
-import woobl0g.boardservice.board.dto.BoardResponseDto;
-import woobl0g.boardservice.board.dto.CreateBoardRequestDto;
-import woobl0g.boardservice.board.dto.UserInfoDto;
-import woobl0g.boardservice.board.dto.UserResponseDto;
+import woobl0g.boardservice.board.dto.*;
 import woobl0g.boardservice.board.event.BoardCreatedEvent;
 import woobl0g.boardservice.board.repository.BoardRepository;
 import woobl0g.boardservice.global.exception.BoardException;
@@ -85,7 +84,7 @@ public class BoardService {
                 .map(dto -> new UserInfoDto(dto.getEmail(), dto.getName()))
                 .orElse(null);
 
-        return new BoardResponseDto(board.getBoardId(), board.getTitle(), board.getContent(), userInfoDto);
+        return new BoardResponseDto(board.getBoardId(), board.getTitle(), board.getContent(), userInfoDto, board.getCreatedAt());
     }
 
     @Transactional(readOnly = true)
@@ -112,7 +111,8 @@ public class BoardService {
                         board.getBoardId(),
                         board.getTitle(),
                         board.getContent(),
-                        userInfoMap.get(board.getUserId())
+                        userInfoMap.get(board.getUserId()),
+                        board.getCreatedAt()
                 ))
                 .toList();
     }
@@ -128,13 +128,23 @@ public class BoardService {
                 board.getBoardId(),
                 board.getTitle(),
                 board.getContent(),
-                userInfoDto
+                userInfoDto,
+                board.getCreatedAt()
         );
     }
 
     @Transactional(readOnly = true)
-    public List<BoardResponseDto> getBoards2() {
-        List<Board> boards = boardRepository.findAll();
+    public List<BoardResponseDto> getBoards2(String keyword, SearchType searchType, Pageable pageable) {
+        Page<Board> boards;
+
+        if (keyword == null || searchType == null) {
+            boards = boardRepository.findAll(pageable);
+        } else {
+            if(SearchType.TITLE.equals(searchType)) boards = boardRepository.findByTitleContaining(keyword, pageable);
+            else if(SearchType.CONTENT.equals(searchType)) boards = boardRepository.findByContentContaining(keyword, pageable);
+            else if(SearchType.EMAIL.equals(searchType)) boards = boardRepository.findByUserEmailContaining(keyword, pageable);
+            else boards = boardRepository.findByTitleOrContentContaining(keyword, pageable);
+        }
 
         return boards.stream()
                 .map(board -> new BoardResponseDto(
@@ -144,7 +154,8 @@ public class BoardService {
                         new UserInfoDto(
                                 board.getUser().getEmail(),
                                 board.getUser().getName()
-                        )
+                        ),
+                        board.getCreatedAt()
                 ))
                 .toList();
     }
