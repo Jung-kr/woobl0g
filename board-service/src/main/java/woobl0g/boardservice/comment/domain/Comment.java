@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import woobl0g.boardservice.board.domain.Board;
 import woobl0g.boardservice.board.domain.User;
+import woobl0g.boardservice.global.exception.CommentException;
+import woobl0g.boardservice.global.response.ResponseCode;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,6 +24,7 @@ public class Comment {
     private Long commentId;
     private String content;
     private boolean isDeleted;
+    private int depth;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
@@ -44,6 +47,7 @@ public class Comment {
     private Comment(String content, Board board, User user, Comment parent) {
         this.content = content;
         this.isDeleted = false;
+        this.depth = (parent == null) ? 0 : (parent.getDepth() + 1);
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.deletedAt = null;
@@ -53,6 +57,15 @@ public class Comment {
     }
 
     public static Comment create(String content, Board board, User user, Comment parent) {
+        if (parent != null && parent.getDepth() >= 1) {
+            throw new CommentException(ResponseCode.REPLY_DEPTH_EXCEEDED);
+        }
         return new Comment(content, board, user, parent);
+    }
+
+    public void softDelete() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
+        this.content = "삭제된 댓글입니다.";
     }
 }

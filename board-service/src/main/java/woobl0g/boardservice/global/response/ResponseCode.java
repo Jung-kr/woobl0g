@@ -10,15 +10,21 @@ public enum ResponseCode {
 
     // 400 BAD REQUEST
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
+    REPLY_DEPTH_EXCEEDED(HttpStatus.BAD_REQUEST, "대댓글에는 답글을 달 수 없습니다."),
+
+    // 403 FORBIDDEN
+    COMMENT_DELETE_FORBIDDEN(HttpStatus.FORBIDDEN, "댓글을 삭제할 권한이 없습니다."),
 
     // 404 NOT FOUND
     BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
 
-    //200 OK
+    //200 OK,
     HEALTH_CHECK_SUCCESS(HttpStatus.OK, "서비스가 정상적으로 동작 중입니다."),
     BOARD_GET_SUCCESS(HttpStatus.OK, "게시글 조회에 성공했습니다."),
+    COMMENT_GET_SUCCESS(HttpStatus.OK, "댓글 조회에 성공했습니다."),
+    COMMENT_DELETE_SUCCESS(HttpStatus.OK, "댓글 삭제에 성공했습니다."),
 
 
     //201 CREATED

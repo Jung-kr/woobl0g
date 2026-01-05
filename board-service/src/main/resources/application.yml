@@ -6,6 +6,10 @@ spring:
     active: local
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100
   kafka:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer

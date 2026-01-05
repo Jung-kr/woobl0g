@@ -16,6 +16,8 @@ import woobl0g.boardservice.global.exception.CommentException;
 import woobl0g.boardservice.global.exception.UserException;
 import woobl0g.boardservice.global.response.ResponseCode;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -40,5 +42,28 @@ public class CommentService {
 
         Comment comment = Comment.create(dto.getContent(), board, user, parent);
         commentRepository.save(comment);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CommentResponseDto> getComments(Long boardId) {
+        return commentRepository.findByBoardIdWithReplies(boardId).stream()
+                .map(CommentResponseDto::from)
+                .toList();
+    }
+
+    @Transactional
+    public void delete(Long commentId, Long userId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentException(ResponseCode.COMMENT_NOT_FOUND));
+
+        if(!comment.getUser().getUserId().equals(userId)) {
+            throw new CommentException(ResponseCode.COMMENT_DELETE_FORBIDDEN);
+        }
+
+        if (!comment.getChildren().isEmpty()) {
+            comment.softDelete();
+        } else {
+            commentRepository.delete(comment);
+        }
     }
 }
