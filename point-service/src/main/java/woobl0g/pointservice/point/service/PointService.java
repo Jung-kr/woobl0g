@@ -1,6 +1,8 @@
 package woobl0g.pointservice.point.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import woobl0g.pointservice.global.exception.PointException;
@@ -10,10 +12,12 @@ import woobl0g.pointservice.point.domain.PointHistory;
 import woobl0g.pointservice.point.dto.AddPointRequestDto;
 import woobl0g.pointservice.point.dto.DeductPointRequestDto;
 import woobl0g.pointservice.point.dto.PointHistoryResponseDto;
+import woobl0g.pointservice.point.dto.PointRankingResponseDto;
 import woobl0g.pointservice.point.repository.PointHistoryRepository;
 import woobl0g.pointservice.point.repository.PointRepository;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -70,6 +74,15 @@ public class PointService {
 
         return histories.stream()
                 .map(PointHistoryResponseDto::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PointRankingResponseDto> getPointRanking(Pageable pageable) {
+        List<Point> rankings = pointRepository.findAll(pageable).getContent();
+
+        return IntStream.range(0, rankings.size())
+                .mapToObj(i -> PointRankingResponseDto.of(i + 1, rankings.get(i)))
                 .toList();
     }
 }
