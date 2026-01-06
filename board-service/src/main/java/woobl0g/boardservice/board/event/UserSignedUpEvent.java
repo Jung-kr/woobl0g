@@ -16,6 +16,7 @@ public class UserSignedUpEvent {
     private Long userId;
     private String name;
     private String email;
+    private String actionType;
 
     public static UserSignedUpEvent fromJson(String json) {
         try {

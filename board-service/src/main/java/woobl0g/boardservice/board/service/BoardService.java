@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import woobl0g.boardservice.board.client.PointClient;
 import woobl0g.boardservice.board.client.UserClient;
 import woobl0g.boardservice.board.domain.Board;
 import woobl0g.boardservice.board.dto.*;
@@ -26,52 +25,16 @@ import java.util.Map;
 public class BoardService {
 
     private final UserClient userClient;
-    private final PointClient pointClient;
     private final BoardRepository boardRepository;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
+    @Transactional
     public void create(CreateBoardRequestDto dto) {
+        Board board = Board.create(dto.getTitle(), dto.getContent(), dto.getUserId());
+        boardRepository.save(board);
 
-        // 게시글 등록 성공 여부를 판단하는 플래그
-        boolean isBoardCreated = false;
-        Long savedBoardId = null;
-
-        // 포인트 차감 성공 여부를 판단하는 플래그
-        boolean isPointDeducted = false;
-
-        try {
-            // 게시글 작성 전 10 포인트 차감
-            pointClient.deductPoints(dto.getUserId(), "BOARD_CREATE");
-            isPointDeducted = true;
-            log.info("[게시글 생성] 포인트 차감 성공 - userId = {}", dto.getUserId());
-
-            // 게시글 작성
-            Board board = Board.create(dto.getTitle(), dto.getContent(), dto.getUserId());
-            savedBoardId = boardRepository.save(board).getBoardId();
-            isBoardCreated = true;
-            log.info("[게시글 생성] 게시글 저장 성공 - boardId = {}", savedBoardId);
-
-            // 게시글 작성 시 활동 점수 10점 부여
-//            userClient.addActivityScore(dto.getUserId(), "BOARD_CREATE");
-//            log.info("[게시글 생성] 활동 점수 적립 성공 - userId = {}", savedBoardId);
-
-            BoardCreatedEvent boardCreatedEvent = new BoardCreatedEvent(dto.getUserId(), "BOARD_CREATE");
-            kafkaTemplate.send("board.created", boardCreatedEvent.toJson());
-        } catch (Exception e) {
-            log.error("[게시글 생성 실패] - userId = {}", savedBoardId, e);
-            if(isBoardCreated) {
-                // 게시글 작성 보상 트랜잭션 -> 게시글 삭제
-                boardRepository.deleteById(savedBoardId);
-                log.warn("[보상 트랜잭션] 게시글 삭제 성공 - boardId = {}", savedBoardId);
-            }
-            if(isPointDeducted) {
-                // 포인트 차감 보상 트랜잭션 -> 포인트 적립
-                pointClient.addPoints(dto.getUserId(), "BOARD_CREATE");
-                log.warn("[보상 트랜잭션] 포인트 적립 성공 - userId = {}", savedBoardId);
-            }
-
-            throw new BoardException(ResponseCode.BOARD_CREATE_FAILED);
-        }
+        BoardCreatedEvent boardCreatedEvent = new BoardCreatedEvent(dto.getUserId(), "BOARD_CREATE");
+        kafkaTemplate.send("board.created", boardCreatedEvent.toJson());
     }
 
     @Transactional(readOnly = true)
