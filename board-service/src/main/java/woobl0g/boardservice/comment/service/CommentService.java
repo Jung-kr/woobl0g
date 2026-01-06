@@ -1,6 +1,7 @@
 package woobl0g.boardservice.comment.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import woobl0g.boardservice.board.domain.Board;
@@ -10,6 +11,7 @@ import woobl0g.boardservice.board.repository.UserRepository;
 import woobl0g.boardservice.comment.domain.Comment;
 import woobl0g.boardservice.comment.dto.CommentResponseDto;
 import woobl0g.boardservice.comment.dto.CreateCommentRequestDto;
+import woobl0g.boardservice.comment.event.CommentCreatedEvent;
 import woobl0g.boardservice.comment.repository.CommentRepository;
 import woobl0g.boardservice.global.exception.BoardException;
 import woobl0g.boardservice.global.exception.CommentException;
@@ -25,6 +27,7 @@ public class CommentService {
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Transactional
     public void create(Long boardId, CreateCommentRequestDto dto, Long userId) {
@@ -42,6 +45,9 @@ public class CommentService {
 
         Comment comment = Comment.create(dto.getContent(), board, user, parent);
         commentRepository.save(comment);
+
+        CommentCreatedEvent commentCreatedEvent = new CommentCreatedEvent(userId, "COMMENT_CREATE");
+        kafkaTemplate.send("comment.created", commentCreatedEvent.toJson());
     }
 
     @Transactional(readOnly = true)
