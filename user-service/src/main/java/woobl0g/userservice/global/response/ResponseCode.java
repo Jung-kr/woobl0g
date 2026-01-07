@@ -12,6 +12,11 @@ public enum ResponseCode {
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
     DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "이미 사용 중인 이메일입니다."),
 
+    // 401 UNAUTHORIZED
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 일치하지 않습니다."),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
+
     // 404 NOT FOUND
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
 
@@ -19,6 +24,8 @@ public enum ResponseCode {
     HEALTH_CHECK_SUCCESS(HttpStatus.OK, "서비스가 정상적으로 동작 중입니다."),
     USER_GET_SUCCESS(HttpStatus.OK, "사용자 조회에 성공했습니다."),
     RANKING_GET_SUCCESS(HttpStatus.OK, "랭킹 조회에 성공했습니다."),
+    LOGIN_SUCCESS(HttpStatus.OK, "로그인에 성공했습니다."),
+    TOKEN_REFRESH_SUCCESS(HttpStatus.OK, "토큰 재발급에 성공했습니다."),
 
     // 201 CREATED
     SIGN_UP_SUCCESS(HttpStatus.CREATED, "회원가입이 완료되었습니다."),

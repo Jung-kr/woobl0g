@@ -1,4 +1,4 @@
-package woobl0g.userservice.user.controller;
+package woobl0g.userservice.auth.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -9,13 +9,11 @@ import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
+import woobl0g.userservice.auth.dto.SignUpRequestDto;
 import woobl0g.userservice.global.response.ApiResponse;
-import woobl0g.userservice.user.dto.SignUpRequestDto;
 
-import java.util.List;
-
-@Tag(name = "User", description = "회원 관련 외부용 API")
-public interface UserController {
+@Tag(name = "Auth", description = "회원 관련 외부용 API")
+public interface AuthController {
 
     @Operation(
             summary = "회원가입",

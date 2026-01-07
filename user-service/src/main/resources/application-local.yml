@@ -16,3 +16,8 @@ spring:
 client:
   point-service:
     url: http://localhost:8082
+
+jwt:
+  secret-key: woo120-secret-1234-1234-1234-1234
+  access-token-validity: 900000  # 30분
+  refresh-token-validity: 604800000  # 7일

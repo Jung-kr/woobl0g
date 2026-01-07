@@ -2,12 +2,13 @@ package woobl0g.userservice.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import woobl0g.userservice.auth.dto.SignUpRequestDto;
 import woobl0g.userservice.global.exception.UserException;
 import woobl0g.userservice.global.response.ResponseCode;
 import woobl0g.userservice.user.domain.User;
-import woobl0g.userservice.user.dto.SignUpRequestDto;
 import woobl0g.userservice.user.dto.UserResponseDto;
 import woobl0g.userservice.user.event.UserSignedUpEvent;
 import woobl0g.userservice.user.repository.UserRepository;
@@ -22,18 +23,22 @@ public class UserService {
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Transactional
-    public void signUp(SignUpRequestDto dto) {
+    public User signUp(SignUpRequestDto dto, PasswordEncoder passwordEncoder) {
 
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new UserException(ResponseCode.DUPLICATE_EMAIL);
         }
 
-        User user = User.create(dto.getEmail(), dto.getName(), dto.getPassword());
+        String encodedPassword = passwordEncoder.encode(dto.getPassword());
+
+        User user = User.create(dto.getEmail(), dto.getName(), encodedPassword);
         User savedUser = userRepository.save(user);
 
         // 회원가입 이벤트 발행 -> board-service에 사용자 데이터 동기화 & point-service에 point 적립
         UserSignedUpEvent userSignedUpEvent = new UserSignedUpEvent(savedUser.getUserId(), savedUser.getName(), savedUser.getEmail(), "SIGN_UP");
         kafkaTemplate.send("user.signed-up", userSignedUpEvent.toJson());
+
+        return savedUser;
     }
 
     @Transactional(readOnly = true)
@@ -56,5 +61,11 @@ public class UserService {
                         user.getName()
                 ))
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserException(ResponseCode.INVALID_CREDENTIALS));
     }
 }
