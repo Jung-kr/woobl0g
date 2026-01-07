@@ -23,7 +23,7 @@ public class UserService {
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Transactional
-    public User signUp(SignUpRequestDto dto, PasswordEncoder passwordEncoder) {
+    public void signUp(SignUpRequestDto dto, PasswordEncoder passwordEncoder) {
 
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new UserException(ResponseCode.DUPLICATE_EMAIL);
@@ -37,8 +37,6 @@ public class UserService {
         // 회원가입 이벤트 발행 -> board-service에 사용자 데이터 동기화 & point-service에 point 적립
         UserSignedUpEvent userSignedUpEvent = new UserSignedUpEvent(savedUser.getUserId(), savedUser.getName(), savedUser.getEmail(), "SIGN_UP");
         kafkaTemplate.send("user.signed-up", userSignedUpEvent.toJson());
-
-        return savedUser;
     }
 
     @Transactional(readOnly = true)
@@ -67,5 +65,11 @@ public class UserService {
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserException(ResponseCode.INVALID_CREDENTIALS));
+    }
+
+    @Transactional(readOnly = true)
+    public User getUserForAuth(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(ResponseCode.USER_NOT_FOUND));
     }
 }
