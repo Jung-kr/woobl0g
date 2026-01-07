@@ -65,7 +65,7 @@ public class Comment {
     }
 
     public boolean canModify() {
-        return ChronoUnit.DAYS.between(createdAt, LocalDateTime.now()) > 1;
+        return ChronoUnit.DAYS.between(createdAt, LocalDateTime.now()) >= 1;
     }
 
     public void softDelete() {
