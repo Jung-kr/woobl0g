@@ -1,0 +1,76 @@
+package woobl0g.userservice.global.jwt;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+
+@Component
+@RequiredArgsConstructor
+public class JwtTokenProvider {
+
+    @Value("${jwt.secret-key}")
+    private String secretKey;
+
+    @Value("${jwt.access-token-validity}")
+    private long accessTokenValidity;
+
+    @Value("${jwt.refresh-token-validity}")
+    private long refreshTokenValidity;
+
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public String createAccessToken(Long userId) {
+        Date nowDate = new Date();
+        Date expiryDate = new Date(nowDate.getTime() + accessTokenValidity);
+
+        return Jwts.builder()
+                .subject(String.valueOf(userId))
+                .issuedAt(nowDate)
+                .expiration(expiryDate)
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    public String createRefreshToken(Long userId) {
+        Date nowDate = new Date();
+        Date expiryDate = new Date(nowDate.getTime() + refreshTokenValidity);
+
+        return Jwts.builder()
+                .subject(String.valueOf(userId))
+                .issuedAt(nowDate)
+                .expiration(expiryDate)
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    // JWT가 유효한지 서명·만료를 검증하고, 유효하면 payload를 디코딩해서 subject(userId)를 꺼내는 작업
+    public Long getUserIdFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return Long.valueOf(claims.getSubject());
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+}
