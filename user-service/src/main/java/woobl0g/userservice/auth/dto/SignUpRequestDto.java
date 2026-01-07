@@ -1,4 +1,4 @@
-package woobl0g.userservice.user.dto;
+package woobl0g.userservice.auth.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
