@@ -16,3 +16,8 @@ spring:
 client:
   point-service:
     url: ${POINT_SERVICE_URL}
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  access-token-validity: ${JWT_ACCESS_TOKEN_VALIDITY:900000}
+  refresh-token-validity: ${JWT_REFRESH_TOKEN_VALIDITY:604800000}
