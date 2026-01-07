@@ -122,4 +122,32 @@ public class BoardService {
                 ))
                 .toList();
     }
+
+    @Transactional
+    public void delete(Long boardId, Long userId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new BoardException(ResponseCode.BOARD_NOT_FOUND));
+        if(!board.getUser().getUserId().equals(userId)) {
+            throw new BoardException(ResponseCode.BOARD_DELETE_FORBIDDEN);
+        }
+        if (!board.canModify()) {
+            throw new BoardException(ResponseCode.BOARD_MODIFY_TOO_EARLY);
+        }
+
+        boardRepository.delete(board);
+    }
+
+    @Transactional
+    public void update(Long boardId, UpdateBoardRequestDto dto, Long userId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new BoardException(ResponseCode.BOARD_NOT_FOUND));
+        if(!board.getUser().getUserId().equals(userId)) {
+            throw new BoardException(ResponseCode.BOARD_UPDATE_FORBIDDEN);
+        }
+        if(!board.canModify()) {
+            throw new BoardException(ResponseCode.BOARD_MODIFY_TOO_EARLY);
+        }
+
+        board.update(dto.getTitle(), dto.getContent());
+    }
 }

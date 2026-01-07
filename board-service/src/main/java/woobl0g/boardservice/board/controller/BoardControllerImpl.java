@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import woobl0g.boardservice.board.dto.BoardResponseDto;
 import woobl0g.boardservice.board.dto.CreateBoardRequestDto;
 import woobl0g.boardservice.board.dto.SearchType;
+import woobl0g.boardservice.board.dto.UpdateBoardRequestDto;
 import woobl0g.boardservice.board.service.BoardService;
 import woobl0g.boardservice.global.response.ApiResponse;
 import woobl0g.boardservice.global.response.ResponseCode;
@@ -51,5 +52,23 @@ public class BoardControllerImpl implements BoardController {
                 .status(ResponseCode.BOARD_GET_SUCCESS.getStatus())
 //                .body(ApiResponse.success(ResponseCode.BOARD_GET_SUCCESS, boardService.getBoards()));
                 .body(ApiResponse.success(ResponseCode.BOARD_GET_SUCCESS, boardService.getBoards2(keyword, searchType, pageable)));
+    }
+
+    @DeleteMapping("/{boardId}")
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long boardId) {
+        boardService.delete(boardId, 1L);
+        return ResponseEntity
+                .status(ResponseCode.BOARD_DELETE_SUCCESS.getStatus())
+                .body(ApiResponse.success(ResponseCode.BOARD_DELETE_SUCCESS));
+    }
+
+    @PatchMapping("/{boardId}")
+    public ResponseEntity<ApiResponse<Void>> update(
+            @PathVariable Long boardId,
+            @RequestBody UpdateBoardRequestDto dto) {
+        boardService.update(boardId, dto, 1L);
+        return ResponseEntity
+                .status(ResponseCode.BOARD_UPDATE_SUCCESS.getStatus())
+                .body(ApiResponse.success(ResponseCode.BOARD_UPDATE_SUCCESS));
     }
 }

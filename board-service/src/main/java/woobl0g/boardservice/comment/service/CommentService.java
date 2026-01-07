@@ -65,11 +65,28 @@ public class CommentService {
         if(!comment.getUser().getUserId().equals(userId)) {
             throw new CommentException(ResponseCode.COMMENT_DELETE_FORBIDDEN);
         }
+        if (!comment.canModify()) {
+            throw new CommentException(ResponseCode.COMMENT_MODIFY_TOO_EARLY);
+        }
 
         if (!comment.getChildren().isEmpty()) {
             comment.softDelete();
         } else {
             commentRepository.delete(comment);
         }
+    }
+
+    @Transactional
+    public void update(Long commentId, CreateCommentRequestDto dto, Long userId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentException(ResponseCode.COMMENT_NOT_FOUND));
+        if(!comment.getUser().getUserId().equals(userId)) {
+            throw new CommentException(ResponseCode.COMMENT_UPDATE_FORBIDDEN);
+        }
+        if(!comment.canModify()) {
+            throw new CommentException(ResponseCode.COMMENT_MODIFY_TOO_EARLY);
+        }
+
+        comment.update(dto.getContent());
     }
 }

@@ -37,7 +37,17 @@ public class CommentControllerImpl {
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long commentId) {
         commentService.delete(commentId, 2L);
         return ResponseEntity
-                .status(ResponseCode.COMMENT_GET_SUCCESS.getStatus())
+                .status(ResponseCode.COMMENT_DELETE_SUCCESS.getStatus())
                 .body(ApiResponse.success(ResponseCode.COMMENT_DELETE_SUCCESS));
+    }
+
+    @PatchMapping("/{commentId}")
+    public ResponseEntity<ApiResponse<Void>> update(
+            @PathVariable Long commentId,
+            @RequestBody CreateCommentRequestDto dto) {
+        commentService.update(commentId, dto, 2L);
+        return ResponseEntity
+                .status(ResponseCode.COMMENT_UPDATE_SUCCESS.getStatus())
+                .body(ApiResponse.success(ResponseCode.COMMENT_UPDATE_SUCCESS));
     }
 }
