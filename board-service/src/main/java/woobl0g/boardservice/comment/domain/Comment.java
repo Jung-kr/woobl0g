@@ -10,6 +10,7 @@ import woobl0g.boardservice.global.exception.CommentException;
 import woobl0g.boardservice.global.response.ResponseCode;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,9 +64,18 @@ public class Comment {
         return new Comment(content, board, user, parent);
     }
 
+    public boolean canModify() {
+        return ChronoUnit.DAYS.between(createdAt, LocalDateTime.now()) >= 1;
+    }
+
     public void softDelete() {
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now();
         this.content = "삭제된 댓글입니다.";
+    }
+
+    public void update(String content) {
+        if (content != null) this.content = content;
+        this.updatedAt = LocalDateTime.now();
     }
 }

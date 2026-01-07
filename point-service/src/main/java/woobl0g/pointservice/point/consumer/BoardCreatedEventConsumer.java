@@ -1,4 +1,4 @@
-package woobl0g.userservice.user.consumer;
+package woobl0g.pointservice.point.consumer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,21 +7,21 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.kafka.retrytopic.DltStrategy;
 import org.springframework.stereotype.Component;
-import woobl0g.userservice.user.domain.ActionType;
-import woobl0g.userservice.user.dto.AddActivityScoreRequestDto;
-import woobl0g.userservice.user.event.BoardCreatedEvent;
-import woobl0g.userservice.user.service.UserService;
+import woobl0g.pointservice.point.domain.PointActionType;
+import woobl0g.pointservice.point.dto.AddPointRequestDto;
+import woobl0g.pointservice.point.event.BoardCreatedEvent;
+import woobl0g.pointservice.point.service.PointService;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class BoardCreatedEventConsumer {
 
-    private final UserService userService;
+    private final PointService pointService;
 
     @KafkaListener(
             topics = "board.created",
-            groupId = "user-service"
+            groupId = "point-service"
     )
     @RetryableTopic(
             attempts = "5",
@@ -30,12 +30,11 @@ public class BoardCreatedEventConsumer {
             dltStrategy = DltStrategy.FAIL_ON_ERROR
     )
     public void consume(String message) {
-
         BoardCreatedEvent event = BoardCreatedEvent.fromJson(message);
 
-        AddActivityScoreRequestDto addActivityScoreRequestDto = new AddActivityScoreRequestDto(event.getUserId(), ActionType.valueOf(event.getActionType()));
-        userService.addActivityScore(addActivityScoreRequestDto);
+        AddPointRequestDto addPointRequestDto = new AddPointRequestDto(event.getUserId(), PointActionType.valueOf(event.getActionType()));
+        pointService.addPoints(addPointRequestDto);
 
-        log.info("[게시글 생성] 활동 점수 적립 완료 - userId = {}", addActivityScoreRequestDto.getUserId());
+        log.info("[게시글 생성] 포인트 적립 완료 - userId = {}", addPointRequestDto.getUserId());
     }
 }

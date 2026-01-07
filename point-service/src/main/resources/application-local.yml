@@ -10,3 +10,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  kafka:
+    bootstrap-servers: localhost:9092
+
+client:
+  user-service:
+    url: http://localhost:8080

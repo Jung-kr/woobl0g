@@ -1,12 +1,12 @@
-package woobl0g.boardservice.board.event;
+package woobl0g.pointservice.point.event;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import woobl0g.boardservice.global.exception.JsonConversionException;
-import woobl0g.boardservice.global.response.ResponseCode;
+import woobl0g.pointservice.global.exception.JsonConversionException;
+import woobl0g.pointservice.global.response.ResponseCode;
 
 @Getter
 @NoArgsConstructor

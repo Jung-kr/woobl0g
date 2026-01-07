@@ -3,9 +3,7 @@ package woobl0g.userservice.user.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import woobl0g.userservice.global.response.ApiResponse;
 import woobl0g.userservice.global.response.ResponseCode;
-import woobl0g.userservice.user.dto.AddActivityScoreRequestDto;
 import woobl0g.userservice.user.dto.UserResponseDto;
 import woobl0g.userservice.user.service.UserService;
 
@@ -31,13 +29,5 @@ public class UserInternalControllerImpl implements UserInternalController {
         return ResponseEntity
                 .status(ResponseCode.USER_GET_SUCCESS.getStatus())
                 .body(userService.getUsers(userIds));
-    }
-
-    @PostMapping("score/add")
-    public ResponseEntity<ApiResponse<Void>> addActivityScore(@RequestBody AddActivityScoreRequestDto addActivityScoreRequestDto) {
-        userService.addActivityScore(addActivityScoreRequestDto);
-        return ResponseEntity
-                .status(ResponseCode.SCORE_ADD_SUCCESS.getStatus())
-                .build();
     }
 }

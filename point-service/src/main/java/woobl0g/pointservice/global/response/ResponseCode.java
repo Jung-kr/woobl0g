@@ -11,6 +11,7 @@ public enum ResponseCode {
     // 200 OK
     HEALTH_CHECK_SUCCESS(HttpStatus.OK, "서비스가 정상적으로 동작 중입니다."),
     POINT_HISTORY_GET_SUCCESS(HttpStatus.OK, "포인트 이력 조회에 성공했습니다."),
+    POINT_RANKING_GET_SUCCESS(HttpStatus.OK, "포인트 랭킹 조회에 성공했습니다."),
 
     // 204 No Content
     POINT_DEDUCT_SUCCESS(HttpStatus.NO_CONTENT, "포인트 차감이 완료되었습니다."),
@@ -21,7 +22,10 @@ public enum ResponseCode {
     INSUFFICIENT_POINT(HttpStatus.BAD_REQUEST, "포인트가 부족합니다."),
 
     // 404 NOT FOUND
-    POINT_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자의 포인트 정보를 찾을 수 없습니다.");
+    POINT_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자의 포인트 정보를 찾을 수 없습니다."),
+
+    // 500 INTERNAL SERVER ERROR
+    JSON_DESERIALIZATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "JSON 역직렬화에 실패했습니다.");
 
     private final HttpStatus status;
     private final String message;
