@@ -12,3 +12,7 @@ spring:
     show-sql: false
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+
+client:
+  user-service:
+    url: ${USER_SERVICE_URL}

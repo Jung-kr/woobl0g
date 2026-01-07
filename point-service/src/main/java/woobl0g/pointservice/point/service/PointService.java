@@ -7,16 +7,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import woobl0g.pointservice.global.exception.PointException;
 import woobl0g.pointservice.global.response.ResponseCode;
+import woobl0g.pointservice.point.client.UserClient;
 import woobl0g.pointservice.point.domain.Point;
 import woobl0g.pointservice.point.domain.PointHistory;
-import woobl0g.pointservice.point.dto.AddPointRequestDto;
-import woobl0g.pointservice.point.dto.DeductPointRequestDto;
-import woobl0g.pointservice.point.dto.PointHistoryResponseDto;
-import woobl0g.pointservice.point.dto.PointRankingResponseDto;
+import woobl0g.pointservice.point.dto.*;
 import woobl0g.pointservice.point.repository.PointHistoryRepository;
 import woobl0g.pointservice.point.repository.PointRepository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 @Service
@@ -25,6 +25,7 @@ public class PointService {
 
     private final PointRepository pointRepository;
     private final PointHistoryRepository pointHistoryRepository;
+    private final UserClient userClient;
 
     @Transactional
     public void addPoints(AddPointRequestDto dto) {
@@ -81,8 +82,21 @@ public class PointService {
     public List<PointRankingResponseDto> getPointRanking(Pageable pageable) {
         List<Point> rankings = pointRepository.findAll(pageable).getContent();
 
+        List<Long> userIds = rankings.stream()
+                .map(Point::getUserId)
+                .toList();
+
+        List<UserResponseDto> userResponseDtos = userClient.fetchUsers(userIds);
+        Map<Long, UserInfoDto> userInfoMap = new HashMap<>();
+        for (UserResponseDto userResponseDto : userResponseDtos) {
+            Long userId = userResponseDto.getUserId();
+            String email = userResponseDto.getEmail();
+            String name = userResponseDto.getName();
+            userInfoMap.put(userId, new UserInfoDto(email, name));
+        }
+
         return IntStream.range(0, rankings.size())
-                .mapToObj(i -> PointRankingResponseDto.of(i + 1, rankings.get(i)))
+                .mapToObj(i -> PointRankingResponseDto.of(i + 1, rankings.get(i).getAmount(), userInfoMap.get(userIds.get(i))))
                 .toList();
     }
 }
