@@ -35,7 +35,7 @@ public class AuthService {
             throw new UserException(ResponseCode.INVALID_CREDENTIALS);
         }
 
-        String accessToken = jwtTokenProvider.createAccessToken(user.getUserId());
+        String accessToken = jwtTokenProvider.createAccessToken(user.getUserId(), user.getRole());
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getUserId());
 
         // [Redis] userId를 key로 refreshToken 저장
@@ -53,7 +53,9 @@ public class AuthService {
         // [Redis] 저장된 Refresh Token 조회 후 요청 토큰과 저장 토큰 비교 -> 같지 않다면 예외
 
         Long userId = jwtTokenProvider.getUserIdFromToken(dto.getRefreshToken());
-        String accessToken = jwtTokenProvider.createAccessToken(userId);
+        User user = userService.getUserForAuth(userId);
+
+        String accessToken = jwtTokenProvider.createAccessToken(userId, user.getRole());
 
         return new TokenResponseDto(accessToken, dto.getRefreshToken(), "Bearer");
     }
