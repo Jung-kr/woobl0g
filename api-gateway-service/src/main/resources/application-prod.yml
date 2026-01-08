@@ -1,0 +1,49 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: user-service
+              uri: ${USER_SERVICE_URL}
+              predicates:
+                - Path=/api/auth/**
+
+            - id: board-service-jwt
+              uri: ${BOARD_SERVICE_URL}
+              predicates:
+                - Path=/api/boards/**
+                - Method=POST,PATCH,DELETE
+              filters:
+                - JwtAuthentication
+            - id: board-service
+              uri: ${BOARD_SERVICE_URL}
+              predicates:
+                - Path=/api/boards/**
+
+            - id: point-service-jwt
+              uri: ${POINT_SERVICE_URL}
+              predicates:
+                - Path=/api/points/history
+                - Method=GET
+              filters:
+                - JwtAuthentication
+            - id: point-service-admin
+              uri: ${POINT_SERVICE_URL}
+              predicates:
+                - Path=/api/admin/points/**
+              filters:
+                - JwtAuthentication
+                - name: RoleAuthorization
+                  args:
+                    requiredRole: ADMIN
+            - id: point-service
+              uri: ${POINT_SERVICE_URL}
+              predicates:
+                - Path=/api/points/**
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
