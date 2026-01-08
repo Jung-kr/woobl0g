@@ -25,13 +25,35 @@ public class BoardControllerImpl implements BoardController {
 
     private final BoardService boardService;
 
-    @Override
     @PostMapping
-    public ResponseEntity<ApiResponse<Void>> create(@Valid @RequestBody CreateBoardRequestDto dto) {
-        boardService.create(dto);
+    public ResponseEntity<ApiResponse<Void>> create(
+            @Valid @RequestBody CreateBoardRequestDto dto,
+            @RequestHeader("X-User-Id") Long userId) {
+        boardService.create(dto, userId);
         return ResponseEntity
                 .status(ResponseCode.BOARD_CREATED.getStatus())
                 .body(ApiResponse.success(ResponseCode.BOARD_CREATED));
+    }
+
+    @DeleteMapping("/{boardId}")
+    public ResponseEntity<ApiResponse<Void>> delete(
+            @PathVariable Long boardId,
+            @RequestHeader("X-User-Id") Long userId) {
+        boardService.delete(boardId, userId);
+        return ResponseEntity
+                .status(ResponseCode.BOARD_DELETE_SUCCESS.getStatus())
+                .body(ApiResponse.success(ResponseCode.BOARD_DELETE_SUCCESS));
+    }
+
+    @PatchMapping("/{boardId}")
+    public ResponseEntity<ApiResponse<Void>> update(
+            @PathVariable Long boardId,
+            @RequestBody UpdateBoardRequestDto dto,
+            @RequestHeader("X-User-Id") Long userId) {
+        boardService.update(boardId, dto, userId);
+        return ResponseEntity
+                .status(ResponseCode.BOARD_UPDATE_SUCCESS.getStatus())
+                .body(ApiResponse.success(ResponseCode.BOARD_UPDATE_SUCCESS));
     }
 
     @GetMapping("/{boardId}")
@@ -52,23 +74,5 @@ public class BoardControllerImpl implements BoardController {
                 .status(ResponseCode.BOARD_GET_SUCCESS.getStatus())
 //                .body(ApiResponse.success(ResponseCode.BOARD_GET_SUCCESS, boardService.getBoards()));
                 .body(ApiResponse.success(ResponseCode.BOARD_GET_SUCCESS, boardService.getBoards2(keyword, searchType, pageable)));
-    }
-
-    @DeleteMapping("/{boardId}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long boardId) {
-        boardService.delete(boardId, 1L);
-        return ResponseEntity
-                .status(ResponseCode.BOARD_DELETE_SUCCESS.getStatus())
-                .body(ApiResponse.success(ResponseCode.BOARD_DELETE_SUCCESS));
-    }
-
-    @PatchMapping("/{boardId}")
-    public ResponseEntity<ApiResponse<Void>> update(
-            @PathVariable Long boardId,
-            @RequestBody UpdateBoardRequestDto dto) {
-        boardService.update(boardId, dto, 1L);
-        return ResponseEntity
-                .status(ResponseCode.BOARD_UPDATE_SUCCESS.getStatus())
-                .body(ApiResponse.success(ResponseCode.BOARD_UPDATE_SUCCESS));
     }
 }
