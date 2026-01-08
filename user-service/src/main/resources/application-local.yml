@@ -12,6 +12,10 @@ spring:
     show-sql: true
   kafka:
     bootstrap-servers: localhost:9092
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 client:
   point-service:
