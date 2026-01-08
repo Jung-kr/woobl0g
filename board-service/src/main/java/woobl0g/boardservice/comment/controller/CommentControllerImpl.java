@@ -19,23 +19,21 @@ public class CommentControllerImpl {
     private final CommentService commentService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Void>> create(@PathVariable Long boardId, @RequestBody CreateCommentRequestDto dto) {
-        commentService.create(boardId, dto, 2L);
+    public ResponseEntity<ApiResponse<Void>> create(
+            @PathVariable Long boardId,
+            @RequestBody CreateCommentRequestDto dto,
+            @RequestHeader("X-User-Id") Long userId) {
+        commentService.create(boardId, dto, userId);
         return ResponseEntity
                 .status(ResponseCode.COMMENT_CREATED.getStatus())
                 .body(ApiResponse.success(ResponseCode.COMMENT_CREATED));
     }
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<CommentResponseDto>>> getComments(@PathVariable Long boardId) {
-        return ResponseEntity
-                .status(ResponseCode.COMMENT_GET_SUCCESS.getStatus())
-                .body(ApiResponse.success(ResponseCode.COMMENT_GET_SUCCESS, commentService.getComments(boardId)));
-    }
-
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long commentId) {
-        commentService.delete(commentId, 2L);
+    public ResponseEntity<ApiResponse<Void>> delete(
+            @PathVariable Long commentId,
+            @RequestHeader("X-User-Id") Long userId) {
+        commentService.delete(commentId, userId);
         return ResponseEntity
                 .status(ResponseCode.COMMENT_DELETE_SUCCESS.getStatus())
                 .body(ApiResponse.success(ResponseCode.COMMENT_DELETE_SUCCESS));
@@ -44,10 +42,18 @@ public class CommentControllerImpl {
     @PatchMapping("/{commentId}")
     public ResponseEntity<ApiResponse<Void>> update(
             @PathVariable Long commentId,
-            @RequestBody CreateCommentRequestDto dto) {
-        commentService.update(commentId, dto, 2L);
+            @RequestBody CreateCommentRequestDto dto,
+            @RequestHeader("X-User-Id") Long userId) {
+        commentService.update(commentId, dto, userId);
         return ResponseEntity
                 .status(ResponseCode.COMMENT_UPDATE_SUCCESS.getStatus())
                 .body(ApiResponse.success(ResponseCode.COMMENT_UPDATE_SUCCESS));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<CommentResponseDto>>> getComments(@PathVariable Long boardId) {
+        return ResponseEntity
+                .status(ResponseCode.COMMENT_GET_SUCCESS.getStatus())
+                .body(ApiResponse.success(ResponseCode.COMMENT_GET_SUCCESS, commentService.getComments(boardId)));
     }
 }

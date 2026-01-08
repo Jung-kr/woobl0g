@@ -29,11 +29,11 @@ public class BoardService {
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Transactional
-    public void create(CreateBoardRequestDto dto) {
-        Board board = Board.create(dto.getTitle(), dto.getContent(), dto.getUserId());
+    public void create(CreateBoardRequestDto dto, Long userId) {
+        Board board = Board.create(dto.getTitle(), dto.getContent(), userId);
         boardRepository.save(board);
 
-        BoardCreatedEvent boardCreatedEvent = new BoardCreatedEvent(dto.getUserId(), "BOARD_CREATE");
+        BoardCreatedEvent boardCreatedEvent = new BoardCreatedEvent(userId, "BOARD_CREATE");
         kafkaTemplate.send("board.created", boardCreatedEvent.toJson());
     }
 
