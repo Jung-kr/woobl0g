@@ -23,6 +23,12 @@ services:
     ports:
       - '3309:3306'
 
+  redis:
+    image: redis:7-alpine
+    container_name: woobl0g-redis
+    ports:
+      - "6379:6379"
+
   kafka:
     image: apache/kafka:4.1.0
     container_name: woobl0g-kafka
