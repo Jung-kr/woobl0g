@@ -18,3 +18,8 @@ client:
     url: http://localhost:8080
   point-service:
     url: http://localhost:8082
+
+logging:
+  level:
+    root: INFO
+    woobl0g.boardservice: DEBUG
