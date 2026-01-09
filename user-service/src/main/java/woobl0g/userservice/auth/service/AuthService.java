@@ -51,7 +51,7 @@ public class AuthService {
                 TimeUnit.DAYS
         );
 
-        return new TokenResponseDto(accessToken, refreshToken, "Bearer");
+        return TokenResponseDto.of(accessToken, refreshToken, "Bearer");
     }
 
     @Transactional(readOnly = true)
@@ -90,6 +90,6 @@ public class AuthService {
                 TimeUnit.DAYS
         );
 
-        return new TokenResponseDto(newAccessToken, newRefreshToken, "Bearer");
+        return TokenResponseDto.of(newAccessToken, newRefreshToken, "Bearer");
     }
 }
