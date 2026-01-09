@@ -32,7 +32,7 @@ public class UserSignedUpEventConsumer {
     public void consume(String message) {
         UserSignedUpEvent event = UserSignedUpEvent.fromJson(message);
 
-        AddPointRequestDto addPointRequestDto = new AddPointRequestDto(event.getUserId(), PointActionType.valueOf(event.getActionType()));
+        AddPointRequestDto addPointRequestDto = AddPointRequestDto.of(event.getUserId(), PointActionType.valueOf(event.getActionType()));
         pointService.addPoints(addPointRequestDto);
 
         log.info("[회원가입] 포인트 적립 완료 - userId = {}", addPointRequestDto.getUserId());

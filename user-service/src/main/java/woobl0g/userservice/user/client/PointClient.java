@@ -23,7 +23,7 @@ public class PointClient {
         restClient.post()
                 .uri("/internal/points/add")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new AddPointsRequestDto(userId, actionType))
+                .body(AddPointsRequestDto.of(userId, actionType))
                 .retrieve()
                 .toBodilessEntity();
     }

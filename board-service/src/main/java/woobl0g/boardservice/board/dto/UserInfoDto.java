@@ -9,4 +9,8 @@ public class UserInfoDto {
 
     private String email;
     private String name;
+
+    public static UserInfoDto of(String email, String name) {
+        return new UserInfoDto(email, name);
+    }
 }

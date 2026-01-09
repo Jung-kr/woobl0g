@@ -35,7 +35,7 @@ public class UserService {
         User savedUser = userRepository.save(user);
 
         // 회원가입 이벤트 발행 -> board-service에 사용자 데이터 동기화 & point-service에 point 적립
-        UserSignedUpEvent userSignedUpEvent = new UserSignedUpEvent(savedUser.getUserId(), savedUser.getName(), savedUser.getEmail(), "SIGN_UP");
+        UserSignedUpEvent userSignedUpEvent = UserSignedUpEvent.of(savedUser.getUserId(), savedUser.getName(), savedUser.getEmail(), "SIGN_UP");
         kafkaTemplate.send("user.signed-up", userSignedUpEvent.toJson());
     }
 

@@ -33,7 +33,7 @@ public class BoardService {
         Board board = Board.create(dto.getTitle(), dto.getContent(), userId);
         boardRepository.save(board);
 
-        BoardCreatedEvent boardCreatedEvent = new BoardCreatedEvent(userId, "BOARD_CREATE");
+        BoardCreatedEvent boardCreatedEvent = BoardCreatedEvent.of(userId, "BOARD_CREATE");
         kafkaTemplate.send("board.created", boardCreatedEvent.toJson());
     }
 
@@ -44,10 +44,10 @@ public class BoardService {
 
         // user-service 로부터 사용자 정보 불러오기 -> user-service가 null 반환하거나 서버 에러 시 Optional.empty() 반환 -> Optional.empty() 반환하면 userDto에 null
         UserInfoDto userInfoDto = userClient.fetchUser(board.getUserId())
-                .map(dto -> new UserInfoDto(dto.getEmail(), dto.getName()))
+                .map(dto -> UserInfoDto.of(dto.getEmail(), dto.getName()))
                 .orElse(null);
 
-        return new BoardResponseDto(board.getBoardId(), board.getTitle(), board.getContent(), userInfoDto, board.getCreatedAt());
+        return BoardResponseDto.from(board, userInfoDto);
     }
 
     @Transactional(readOnly = true)
@@ -66,17 +66,11 @@ public class BoardService {
             Long userId = userResponseDto.getUserId();
             String email = userResponseDto.getEmail();
             String name = userResponseDto.getName();
-            userInfoMap.put(userId, new UserInfoDto(email, name));
+            userInfoMap.put(userId, UserInfoDto.of(email, name));
         }
 
         return boards.stream()
-                .map(board -> new BoardResponseDto(
-                        board.getBoardId(),
-                        board.getTitle(),
-                        board.getContent(),
-                        userInfoMap.get(board.getUserId()),
-                        board.getCreatedAt()
-                ))
+                .map(board -> BoardResponseDto.from(board, userInfoMap.get(board.getUserId())))
                 .toList();
     }
 
@@ -85,15 +79,9 @@ public class BoardService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardException(ResponseCode.BOARD_NOT_FOUND));
 
-        UserInfoDto userInfoDto = new UserInfoDto(board.getUser().getEmail(), board.getUser().getName());
+        UserInfoDto userInfoDto = UserInfoDto.of(board.getUser().getEmail(), board.getUser().getName());
 
-        return new BoardResponseDto(
-                board.getBoardId(),
-                board.getTitle(),
-                board.getContent(),
-                userInfoDto,
-                board.getCreatedAt()
-        );
+        return BoardResponseDto.from(board, userInfoDto);
     }
 
     @Transactional(readOnly = true)
@@ -110,16 +98,7 @@ public class BoardService {
         }
 
         return boards.stream()
-                .map(board -> new BoardResponseDto(
-                        board.getBoardId(),
-                        board.getTitle(),
-                        board.getContent(),
-                        new UserInfoDto(
-                                board.getUser().getEmail(),
-                                board.getUser().getName()
-                        ),
-                        board.getCreatedAt()
-                ))
+                .map(board -> BoardResponseDto.from(board, UserInfoDto.of(board.getUser().getEmail(), board.getUser().getName())))
                 .toList();
     }
 

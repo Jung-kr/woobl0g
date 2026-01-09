@@ -22,4 +22,8 @@ public class BoardCreatedEvent {
             throw new JsonConversionException(ResponseCode.JSON_SERIALIZATION_FAILED);
         }
     }
+
+    public static BoardCreatedEvent of(Long userId, String actionType) {
+        return new BoardCreatedEvent(userId, actionType);
+    }
 }

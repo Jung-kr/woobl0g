@@ -92,7 +92,7 @@ public class PointService {
             Long userId = userResponseDto.getUserId();
             String email = userResponseDto.getEmail();
             String name = userResponseDto.getName();
-            userInfoMap.put(userId, new UserInfoDto(email, name));
+            userInfoMap.put(userId, UserInfoDto.of(email, name));
         }
 
         return IntStream.range(0, rankings.size())

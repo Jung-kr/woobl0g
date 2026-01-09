@@ -10,4 +10,8 @@ public class SavedUserRequestDto {
     private Long userId;
     private String name;
     private String email;
+
+    public static SavedUserRequestDto of(Long userId, String name, String email) {
+        return new SavedUserRequestDto(userId, name, email);
+    }
 }

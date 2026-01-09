@@ -26,4 +26,8 @@ public class UserSignedUpEvent {
             throw new JsonConversionException(ResponseCode.JSON_SERIALIZATION_FAILED);
         }
     }
+
+    public static UserSignedUpEvent of(Long userId, String name, String email, String actionType) {
+        return new UserSignedUpEvent(userId, name, email, actionType);
+    }
 }

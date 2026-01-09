@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import woobl0g.boardservice.board.domain.Board;
 import woobl0g.boardservice.board.domain.User;
+import woobl0g.boardservice.board.dto.UpdateCommentRequestDto;
 import woobl0g.boardservice.board.repository.BoardRepository;
 import woobl0g.boardservice.board.repository.UserRepository;
 import woobl0g.boardservice.comment.domain.Comment;
@@ -77,7 +78,7 @@ public class CommentService {
     }
 
     @Transactional
-    public void update(Long commentId, CreateCommentRequestDto dto, Long userId) {
+    public void update(Long commentId, UpdateCommentRequestDto dto, Long userId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentException(ResponseCode.COMMENT_NOT_FOUND));
         if(!comment.getUser().getUserId().equals(userId)) {

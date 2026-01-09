@@ -9,4 +9,8 @@ public class AddPointsRequestDto {
 
     private Long userId;
     private String actionType;
+
+    public static AddPointsRequestDto of(Long userId, String actionType) {
+        return new AddPointsRequestDto(userId, actionType);
+    }
 }

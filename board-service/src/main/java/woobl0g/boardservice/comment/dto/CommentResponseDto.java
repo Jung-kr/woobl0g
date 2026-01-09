@@ -27,7 +27,7 @@ public class CommentResponseDto {
         UserInfoDto userInfoDto = null;
         if (!comment.isDeleted()) {
             User user = comment.getUser();
-            userInfoDto = new UserInfoDto(user.getEmail(), user.getName());
+            userInfoDto = UserInfoDto.of(user.getEmail(), user.getName());
         }
 
         List<CommentResponseDto> replies = comment.getChildren().stream()
@@ -35,7 +35,7 @@ public class CommentResponseDto {
                     UserInfoDto childUserDto = null;
                     if (!child.isDeleted()) {
                         User childUser = child.getUser();
-                        childUserDto = new UserInfoDto(childUser.getEmail(), childUser.getName());
+                        childUserDto = UserInfoDto.of(childUser.getEmail(), childUser.getName());
                     }
 
                     return new CommentResponseDto(
