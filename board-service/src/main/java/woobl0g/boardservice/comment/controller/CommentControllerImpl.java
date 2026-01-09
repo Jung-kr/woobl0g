@@ -1,8 +1,10 @@
 package woobl0g.boardservice.comment.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.sql.Update;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import woobl0g.boardservice.board.dto.UpdateCommentRequestDto;
 import woobl0g.boardservice.comment.dto.CommentResponseDto;
 import woobl0g.boardservice.comment.dto.CreateCommentRequestDto;
 import woobl0g.boardservice.comment.service.CommentService;
@@ -42,7 +44,7 @@ public class CommentControllerImpl {
     @PatchMapping("/{commentId}")
     public ResponseEntity<ApiResponse<Void>> update(
             @PathVariable Long commentId,
-            @RequestBody CreateCommentRequestDto dto,
+            @RequestBody UpdateCommentRequestDto dto,
             @RequestHeader("X-User-Id") Long userId) {
         commentService.update(commentId, dto, userId);
         return ResponseEntity

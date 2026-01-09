@@ -29,7 +29,7 @@ public class UserSignedUpEventConsumer {
     public void consume(String message) {
         UserSignedUpEvent userSignedUpEvent = UserSignedUpEvent.fromJson(message);
 
-        SavedUserRequestDto savedUserRequestDto = new SavedUserRequestDto(
+        SavedUserRequestDto savedUserRequestDto = SavedUserRequestDto.of(
                 userSignedUpEvent.getUserId(),
                 userSignedUpEvent.getName(),
                 userSignedUpEvent.getEmail());
