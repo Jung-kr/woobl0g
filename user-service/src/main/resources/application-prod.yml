@@ -25,3 +25,16 @@ jwt:
   secret-key: ${JWT_SECRET_KEY}
   access-token-validity: ${JWT_ACCESS_TOKEN_VALIDITY:900000}
   refresh-token-validity: ${JWT_REFRESH_TOKEN_VALIDITY:604800000}
+
+logging:
+  level:
+    root: INFO
+    woobl0g.userservice: INFO
+  file:
+    name: logs/user-service.log
+    path: logs
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+      total-size-cap: 1GB
