@@ -47,3 +47,8 @@ spring:
 
 jwt:
   secret-key: woo120-secret-1234-1234-1234-1234
+
+logging:
+  level:
+    root: INFO
+    wooBlog.apigatewayservice: DEBUG
