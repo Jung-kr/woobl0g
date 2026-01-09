@@ -10,4 +10,8 @@ public class AddPointRequestDto {
 
     private Long userId;
     private PointActionType actionType;
+
+    public static AddPointRequestDto of(Long userId, PointActionType actionType) {
+        return new AddPointRequestDto(userId, actionType);
+    }
 }
