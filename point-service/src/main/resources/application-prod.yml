@@ -16,3 +16,16 @@ spring:
 client:
   user-service:
     url: ${USER_SERVICE_URL}
+
+logging:
+  level:
+    root: INFO
+    woobl0g.pointservice: INFO
+  file:
+    name: logs/point-service.log
+    path: logs
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+      total-size-cap: 1GB

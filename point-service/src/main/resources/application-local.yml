@@ -16,3 +16,8 @@ spring:
 client:
   user-service:
     url: http://localhost:8080
+
+logging:
+  level:
+    root: INFO
+    woobl0g.pointservice: DEBUG
