@@ -32,10 +32,11 @@ public class JwtAuthenticationGatewayFilterFactory extends AbstractGatewayFilter
             String token = jwtTokenProvider.resolveToken(
                     exchange.getRequest().getHeaders().getFirst("Authorization")
             );
-            log.info("token : {}", token);
+            log.debug("JWT 토큰 추출: token={}", token != null ? "존재" : "없음");
 
             // 토큰이 없을 경우 401 Unauthorized로 응답
             if (token == null) {
+                log.warn("JWT 인증 실패 - 토큰 없음: path={}", exchange.getRequest().getPath());
                 return gatewayErrorResponseWriter.onError(exchange, HttpStatus.UNAUTHORIZED, "TOKEN_MISSING");
             }
 
@@ -45,6 +46,8 @@ public class JwtAuthenticationGatewayFilterFactory extends AbstractGatewayFilter
 
                 String userId = claims.getSubject();
                 String role = claims.get("role").toString();
+
+                log.debug("JWT 인증 성공: userId={}, role={}", userId, role);
 
                 // Payload를 X-User-Id 헤더에 담아서 Request 전달
                 return chain.filter(
@@ -59,8 +62,11 @@ public class JwtAuthenticationGatewayFilterFactory extends AbstractGatewayFilter
                                 .build()
                 );
             } catch (ExpiredJwtException e) {  //유효한 토큰이지만 만료 → 재발급 필요
+                log.warn("JWT 인증 실패 - 토큰 만료: path={}", exchange.getRequest().getPath());
                 return gatewayErrorResponseWriter.onError(exchange, HttpStatus.UNAUTHORIZED, "TOKEN_EXPIRED");
             } catch (JwtException | IllegalArgumentException e) {  // 위조, 변조, 형식 오류 → 즉시 차단
+                log.warn("JWT 인증 실패 - 유효하지 않은 토큰: path={}, error={}", 
+                        exchange.getRequest().getPath(), e.getMessage());
                 return gatewayErrorResponseWriter.onError(exchange, HttpStatus.UNAUTHORIZED, "INVALID_TOKEN");
             }
         };

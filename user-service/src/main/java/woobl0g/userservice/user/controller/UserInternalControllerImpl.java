@@ -24,6 +24,7 @@ public class UserInternalControllerImpl implements UserInternalController {
                 .body(userService.getUser(userId));
     }
 
+    @Override
     @GetMapping
     public ResponseEntity<List<UserResponseDto>> getAllUsers(@RequestParam List<Long> userIds) {
         return ResponseEntity

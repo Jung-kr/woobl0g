@@ -31,11 +31,13 @@ public class CommentCreatedEventConsumer {
             dltStrategy = DltStrategy.FAIL_ON_ERROR
     )
     public void consume(String message) {
+        log.debug("댓글 생성 이벤트 수신: message={}", message);
+        
         CommentCreatedEvent event = CommentCreatedEvent.fromJson(message);
 
         AddPointRequestDto addPointRequestDto = AddPointRequestDto.of(event.getUserId(), PointActionType.valueOf(event.getActionType()));
         pointService.addPoints(addPointRequestDto);
 
-        log.info("[댓글 생성] 포인트 적립 완료 - userId = {}", addPointRequestDto.getUserId());
+        log.info("댓글 생성 포인트 적립 완료: userId={}", addPointRequestDto.getUserId());
     }
 }

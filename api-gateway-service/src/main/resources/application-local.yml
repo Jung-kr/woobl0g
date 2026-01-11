@@ -45,6 +45,28 @@ spring:
               predicates:
                 - Path=/api/points/**
 
+            # Swagger Docs 관련 설정
+            - id: user-service-docs
+              uri: http://localhost:8080
+              predicates:
+                - Path=/v3/api-docs/user-service
+              filters:
+                - RewritePath=/v3/api-docs/user-service, /v3/api-docs
+
+            - id: board-service-docs
+              uri: http://localhost:8081
+              predicates:
+                - Path=/v3/api-docs/board-service
+              filters:
+                - RewritePath=/v3/api-docs/board-service, /v3/api-docs
+
+            - id: point-service-docs
+              uri: http://localhost:8082
+              predicates:
+                - Path=/v3/api-docs/point-service
+              filters:
+                - RewritePath=/v3/api-docs/point-service, /v3/api-docs
+
 jwt:
   secret-key: woo120-secret-1234-1234-1234-1234
 

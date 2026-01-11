@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import woobl0g.userservice.global.exception.UserException;
+import woobl0g.userservice.global.response.ResponseCode;
 
 import java.time.LocalDateTime;
 
@@ -35,5 +38,11 @@ public class User {
 
     public static User create(String email, String name, String password) {
         return new User(email, name, password, Role.USER);
+    }
+
+    public void validatePassword(String rawPassword, PasswordEncoder passwordEncoder) {
+        if (!passwordEncoder.matches(rawPassword, this.password)) {
+            throw new UserException(ResponseCode.INVALID_CREDENTIALS);
+        }
     }
 }

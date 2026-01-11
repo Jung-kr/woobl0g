@@ -30,11 +30,13 @@ public class UserSignedUpEventConsumer {
             dltStrategy = DltStrategy.FAIL_ON_ERROR
     )
     public void consume(String message) {
+        log.debug("회원가입 이벤트 수신: message={}", message);
+        
         UserSignedUpEvent event = UserSignedUpEvent.fromJson(message);
 
         AddPointRequestDto addPointRequestDto = AddPointRequestDto.of(event.getUserId(), PointActionType.valueOf(event.getActionType()));
         pointService.addPoints(addPointRequestDto);
 
-        log.info("[회원가입] 포인트 적립 완료 - userId = {}", addPointRequestDto.getUserId());
+        log.info("회원가입 포인트 적립 완료: userId={}", addPointRequestDto.getUserId());
     }
 }

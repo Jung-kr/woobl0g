@@ -1,5 +1,6 @@
 package woobl0g.userservice.auth.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,18 +18,20 @@ import woobl0g.userservice.global.response.ResponseCode;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
-public class AuthControllerImpl {
+public class AuthControllerImpl implements AuthController {
 
     private final AuthService authService;
 
+    @Override
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<Void>> signup(@RequestBody SignUpRequestDto dto) {
+    public ResponseEntity<ApiResponse<Void>> signUp(@Valid @RequestBody SignUpRequestDto dto) {
         authService.signUp(dto);
         return ResponseEntity
                 .status(ResponseCode.SIGN_UP_SUCCESS.getStatus())
                 .body(ApiResponse.success(ResponseCode.SIGN_UP_SUCCESS));
     }
 
+    @Override
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<TokenResponseDto>> login(@RequestBody LoginRequestDto dto) {
         return ResponseEntity
@@ -36,6 +39,7 @@ public class AuthControllerImpl {
                 .body(ApiResponse.success(ResponseCode.LOGIN_SUCCESS, authService.login(dto)));
     }
 
+    @Override
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<TokenResponseDto>> refresh(@RequestBody RefreshTokenRequestDto dto) {
         return ResponseEntity

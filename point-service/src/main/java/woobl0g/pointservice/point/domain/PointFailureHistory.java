@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import woobl0g.pointservice.global.exception.PointException;
+import woobl0g.pointservice.global.response.ResponseCode;
 
 import java.time.LocalDateTime;
 
@@ -44,5 +46,11 @@ public class PointFailureHistory {
 
     public void markAsIgnored() {
         this.status = FailureStatus.IGNORED;
+    }
+
+    public void validateRetryable() {
+        if (this.status != FailureStatus.PENDING) {
+            throw new PointException(ResponseCode.ADMIN_POINT_FAILURE_ALREADY_PROCESSED);
+        }
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import woobl0g.pointservice.global.response.ApiResponse;
 import woobl0g.pointservice.global.response.ResponseCode;
+import woobl0g.pointservice.point.dto.PageResponse;
 import woobl0g.pointservice.point.dto.PointHistoryResponseDto;
 import woobl0g.pointservice.point.dto.PointRankingResponseDto;
 import woobl0g.pointservice.point.service.PointService;
@@ -23,12 +24,16 @@ public class PointControllerImpl implements PointController {
 
     @Override
     @GetMapping("/history")
-    public ResponseEntity<ApiResponse<List<PointHistoryResponseDto>>> getPointHistory(@RequestHeader("X-User-Id") Long userId) {
+    public ResponseEntity<ApiResponse<PageResponse<PointHistoryResponseDto>>> getPointHistory(
+            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestHeader("X-User-Id") Long userId
+    ) {
         return ResponseEntity
                 .status(ResponseCode.POINT_HISTORY_GET_SUCCESS.getStatus())
-                .body(ApiResponse.success(ResponseCode.POINT_HISTORY_GET_SUCCESS, pointService.getPointHistory(userId)));
+                .body(ApiResponse.success(ResponseCode.POINT_HISTORY_GET_SUCCESS, pointService.getPointHistory(userId, pageable)));
     }
 
+    @Override
     @GetMapping("/ranking")
     public ResponseEntity<ApiResponse<List<PointRankingResponseDto>>> getPointRanking(
             @PageableDefault(page = 0, size = 10, sort = "amount", direction = Sort.Direction.DESC) Pageable pageable

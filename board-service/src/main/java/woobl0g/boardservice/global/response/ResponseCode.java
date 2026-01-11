@@ -15,10 +15,8 @@ public enum ResponseCode {
     COMMENT_MODIFY_TOO_EARLY(HttpStatus.BAD_REQUEST, "댓글은 작성 후 1일이 지나야 수정 or 삭제할 수 있습니다."),
 
     // 403 FORBIDDEN
-    COMMENT_DELETE_FORBIDDEN(HttpStatus.FORBIDDEN, "댓글을 삭제할 권한이 없습니다."),
-    COMMENT_UPDATE_FORBIDDEN(HttpStatus.FORBIDDEN, "댓글을 수정할 권한이 없습니다."),
-    BOARD_DELETE_FORBIDDEN(HttpStatus.FORBIDDEN, "게시글을 삭제할 권한이 없습니다."),
-    BOARD_UPDATE_FORBIDDEN(HttpStatus.FORBIDDEN, "게시글을 수정할 권한이 없습니다."),
+    COMMENT_MODIFY_FORBIDDEN(HttpStatus.FORBIDDEN, "댓글을 수정 or 삭제할 권한이 없습니다."),
+    BOARD_MODIFY_FORBIDDEN(HttpStatus.FORBIDDEN, "게시글을 수정 or 삭제할 권한이 없습니다."),
 
     // 404 NOT FOUND
     BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다."),
@@ -41,7 +39,9 @@ public enum ResponseCode {
     // 500 INTERNAL SERVER ERROR
     BOARD_CREATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "게시글 생성에 실패했습니다."),
     JSON_SERIALIZATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "JSON 직렬화에 실패했습니다."),
-    JSON_DESERIALIZATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "JSON 역직렬화에 실패했습니다.");
+    JSON_DESERIALIZATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "JSON 역직렬화에 실패했습니다."),
+    USER_SYNC_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "사용자 동기화에 실패했습니다."),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
 
     private final HttpStatus status;
     private final String message;

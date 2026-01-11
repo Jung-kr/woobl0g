@@ -18,6 +18,8 @@ client:
     url: ${USER_SERVICE_URL}
   point-service:
     url: ${POINT_SERVICE_URL}
+  api-gateway-service:
+    url: ${API_GATEWAY_SERVICE_URL}
 
 logging:
   level:

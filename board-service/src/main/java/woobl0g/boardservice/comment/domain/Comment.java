@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import woobl0g.boardservice.board.domain.Board;
 import woobl0g.boardservice.board.domain.User;
+import woobl0g.boardservice.global.exception.BoardException;
 import woobl0g.boardservice.global.exception.CommentException;
 import woobl0g.boardservice.global.response.ResponseCode;
 
@@ -74,8 +75,24 @@ public class Comment {
         this.content = "삭제된 댓글입니다.";
     }
 
+    public boolean shouldSoftDelete() {
+        return !children.isEmpty();
+    }
+
     public void update(String content) {
         if (content != null) this.content = content;
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public void validateOwnership(Long requestUserId) {
+        if (!user.getUserId().equals(requestUserId)) {
+            throw new CommentException(ResponseCode.COMMENT_MODIFY_FORBIDDEN);
+        }
+    }
+
+    public void validateModifiable() {
+        if (!canModify()) {
+            throw new CommentException(ResponseCode.COMMENT_MODIFY_TOO_EARLY);
+        }
     }
 }

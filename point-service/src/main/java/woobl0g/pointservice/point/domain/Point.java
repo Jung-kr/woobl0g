@@ -24,20 +24,25 @@ public class Point {
         this.amount = amount;
     }
 
-    public static Point create(Long userId, int amount) {
-        return new Point(userId, amount);
+    public static Point create(Long userId) {
+        return new Point(userId, 0);
     }
 
     // 포인트 적립
-    public void addAmount(int amount) {
+    public PointHistory addAmount(PointActionType actionType) {
+        int amount = actionType.getAmount();
         this.amount += amount;
+        return PointHistory.create(userId, amount, actionType.name());
     }
 
     // 포인트 차감
-    public void deductAmount(int amount) {
+    public PointHistory deductAmount(PointActionType actionType) {
+        int amount = actionType.getAmount();
         if (this.amount < amount) {
             throw new PointException(ResponseCode.INSUFFICIENT_POINT);
         }
         this.amount -= amount;
+
+        return PointHistory.create(userId, -amount, actionType.name());
     }
 }
