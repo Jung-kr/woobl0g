@@ -54,7 +54,7 @@ public interface BoardController {
                     )
             )
             @Valid @RequestBody CreateBoardRequestDto dto,
-            @Parameter(description = "사용자 ID (헤더)", required = true)
+            @Parameter(hidden = true)
             @RequestHeader("X-User-Id") Long userId
     );
 
@@ -99,7 +99,7 @@ public interface BoardController {
     ResponseEntity<ApiResponse<Void>> delete(
             @Parameter(description = "삭제할 게시글 ID", required = true, example = "1")
             @PathVariable Long boardId,
-            @Parameter(description = "사용자 ID (헤더)", required = true)
+            @Parameter(hidden = true)
             @RequestHeader("X-User-Id") Long userId
     );
 
@@ -153,7 +153,7 @@ public interface BoardController {
                     )
             )
             @RequestBody UpdateBoardRequestDto dto,
-            @Parameter(description = "사용자 ID (헤더)", required = true)
+            @Parameter(hidden = true)
             @RequestHeader("X-User-Id") Long userId
     );
 

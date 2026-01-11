@@ -64,7 +64,7 @@ public interface CommentController {
                     )
             )
             @RequestBody CreateCommentRequestDto dto,
-            @Parameter(description = "사용자 ID (헤더)", required = true)
+            @Parameter(hidden = true)
             @RequestHeader("X-User-Id") Long userId
     );
 
@@ -109,7 +109,7 @@ public interface CommentController {
     ResponseEntity<ApiResponse<Void>> delete(
             @Parameter(description = "삭제할 댓글 ID", required = true, example = "1")
             @PathVariable Long commentId,
-            @Parameter(description = "사용자 ID (헤더)", required = true)
+            @Parameter(hidden = true)
             @RequestHeader("X-User-Id") Long userId
     );
 
@@ -163,7 +163,7 @@ public interface CommentController {
                     )
             )
             @RequestBody UpdateCommentRequestDto dto,
-            @Parameter(description = "사용자 ID (헤더)", required = true)
+            @Parameter(hidden = true)
             @RequestHeader("X-User-Id") Long userId
     );
 
