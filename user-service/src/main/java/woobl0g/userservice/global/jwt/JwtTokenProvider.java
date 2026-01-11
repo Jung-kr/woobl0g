@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import woobl0g.userservice.user.domain.Role;
@@ -12,6 +13,7 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProvider {
@@ -33,6 +35,8 @@ public class JwtTokenProvider {
         Date nowDate = new Date();
         Date expiryDate = new Date(nowDate.getTime() + accessTokenValidity);
 
+        log.debug("액세스 토큰 생성: userId={}, role={}", userId, role);
+
         return Jwts.builder()
                 .subject(String.valueOf(userId))
                 .claim("role", role.name())
@@ -45,6 +49,8 @@ public class JwtTokenProvider {
     public String createRefreshToken(Long userId) {
         Date nowDate = new Date();
         Date expiryDate = new Date(nowDate.getTime() + refreshTokenValidity);
+
+        log.debug("리프레시 토큰 생성: userId={}", userId);
 
         return Jwts.builder()
                 .subject(String.valueOf(userId))
@@ -72,6 +78,7 @@ public class JwtTokenProvider {
                     .parseSignedClaims(token);
             return true;
         } catch (Exception e) {
+            log.warn("토큰 검증 실패: {}", e.getMessage());
             return false;
         }
     }
