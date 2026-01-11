@@ -18,6 +18,8 @@ client:
     url: http://localhost:8080
   point-service:
     url: http://localhost:8082
+  api-gateway-service:
+    url: http://localhost:8000
 
 logging:
   level:

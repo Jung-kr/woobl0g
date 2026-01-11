@@ -2,11 +2,19 @@ package woobl0g.boardservice.global.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.servers.Server;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 @Configuration
 public class SwaggerConfig {
+
+    @Value("${client.api-gateway-service.url}")
+    private String apiGatewayServiceUrl;
+
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
@@ -14,6 +22,11 @@ public class SwaggerConfig {
                         .title("Woobl0g")
                         .description("board-service")
                         .version("1.0.0")
-                );
+                )
+                .servers(List.of(
+                        new Server()
+                                .url(apiGatewayServiceUrl)
+                                .description("API Gateway")
+                ));
     }
 }
