@@ -85,7 +85,7 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
-    public List<BoardResponseDto> getBoards2(String keyword, SearchType searchType, Pageable pageable) {
+    public PageResponse<BoardResponseDto> getBoards2(String keyword, SearchType searchType, Pageable pageable) {
         Page<Board> boards;
 
         if (keyword == null || searchType == null) {
@@ -97,9 +97,17 @@ public class BoardService {
             else boards = boardRepository.findByTitleOrContentContaining(keyword, pageable);
         }
 
-        return boards.stream()
-                .map(board -> BoardResponseDto.from(board, UserInfoDto.of(board.getUser().getEmail(), board.getUser().getName())))
-                .toList();
+        return PageResponse.of(
+                boards.map(board ->
+                        BoardResponseDto.from(
+                                board,
+                                UserInfoDto.of(
+                                        board.getUser().getEmail(),
+                                        board.getUser().getName()
+                                )
+                        )
+                )
+        );
     }
 
     @Transactional

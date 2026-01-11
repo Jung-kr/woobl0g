@@ -7,10 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import woobl0g.boardservice.board.dto.BoardResponseDto;
-import woobl0g.boardservice.board.dto.CreateBoardRequestDto;
-import woobl0g.boardservice.board.dto.SearchType;
-import woobl0g.boardservice.board.dto.UpdateBoardRequestDto;
+import woobl0g.boardservice.board.dto.*;
 import woobl0g.boardservice.board.service.BoardService;
 import woobl0g.boardservice.global.response.ApiResponse;
 import woobl0g.boardservice.global.response.ResponseCode;
@@ -65,7 +62,7 @@ public class BoardControllerImpl implements BoardController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<BoardResponseDto>>> getBoards(
+    public ResponseEntity<ApiResponse<PageResponse<BoardResponseDto>>> getBoards(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) SearchType searchType,
             @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
