@@ -51,7 +51,7 @@ public interface PointController {
                     required = false
             )
             @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-            @Parameter(description = "사용자 ID (헤더)", required = true)
+            @Parameter(hidden = true)
             @RequestHeader("X-User-Id") Long userId
     );
 
