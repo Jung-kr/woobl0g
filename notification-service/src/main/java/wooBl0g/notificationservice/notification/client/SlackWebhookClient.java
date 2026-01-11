@@ -23,6 +23,8 @@ public class SlackWebhookClient {
     }
 
     public void sendMessage(String message) {
+        log.debug("Slack Webhook 호출 시작");
+        
         try {
             restClient.post()
                     .uri(webhookUrl)
@@ -30,8 +32,10 @@ public class SlackWebhookClient {
                     .body(Map.of("text", message))
                     .retrieve()
                     .toBodilessEntity();
+            
+            log.debug("Slack Webhook 호출 성공");
         } catch (Exception e) {
-            log.warn("Slack Webhook 전송 실패", e);
+            log.error("Slack Webhook 전송 실패", e);
         }
     }
 }

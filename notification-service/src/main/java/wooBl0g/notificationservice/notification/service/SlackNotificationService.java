@@ -18,10 +18,14 @@ public class SlackNotificationService implements NotificationService{
 
     @Override
     public void sendNotification(Long userId, String actionType) {
+        log.info("Slack 알림 전송 시작: userId={}, actionType={}", userId, actionType);
+        
         String message = formatMessage(userId, actionType);
-        log.debug("message: {}", message);
+        log.debug("전송 메시지: {}", message);
 
         slackWebhookClient.sendMessage(message);
+        
+        log.info("Slack 알림 전송 완료: userId={}", userId);
     }
 
     private String formatMessage(Long userId, String actionType) {
