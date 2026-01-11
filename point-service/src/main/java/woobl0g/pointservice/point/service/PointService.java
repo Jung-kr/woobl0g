@@ -1,6 +1,7 @@
 package woobl0g.pointservice.point.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PointService {
@@ -29,10 +31,13 @@ public class PointService {
 
     @Transactional
     public void addPoints(AddPointRequestDto dto) {
+        log.debug("포인트 적립 시작: userId={}, actionType={}", dto.getUserId(), dto.getActionType());
+        
         Point point = pointRepository.findByUserId(dto.getUserId())
-                .orElseGet(() -> pointRepository.save(
-                        Point.create(dto.getUserId(), 0)
-                ));
+                .orElseGet(() -> {
+                    log.info("신규 포인트 엔티티 생성: userId={}", dto.getUserId());
+                    return pointRepository.save(Point.create(dto.getUserId(), 0));
+                });
 
         int pointChange = dto.getActionType().getAmount();
         String reason = dto.getActionType().name();
@@ -45,10 +50,14 @@ public class PointService {
                 pointChange,
                 reason
         ));
+        
+        log.info("포인트 적립 완료: userId={}, amount={}, reason={}", dto.getUserId(), pointChange, reason);
     }
 
     @Transactional
     public void deductPoints(DeductPointRequestDto dto) {
+        log.info("포인트 차감 시작: userId={}, actionType={}", dto.getUserId(), dto.getActionType());
+        
         Point point = pointRepository.findByUserId(dto.getUserId())
                 .orElseThrow(() -> new PointException(ResponseCode.POINT_NOT_FOUND));
 
@@ -63,11 +72,16 @@ public class PointService {
                 pointChange,
                 reason
         ));
+        
+        log.info("포인트 차감 완료: userId={}, amount={}, reason={}", dto.getUserId(), pointChange, reason);
     }
 
     @Transactional(readOnly = true)
     public PageResponse<PointHistoryResponseDto> getPointHistory(Long userId, Pageable pageable) {
+        log.debug("포인트 이력 조회: userId={}, page={}", userId, pageable.getPageNumber());
+        
         if (!pointRepository.existsByUserId(userId)) {
+            log.warn("포인트 이력 조회 실패 - 포인트 없음: userId={}", userId);
             throw new PointException(ResponseCode.POINT_NOT_FOUND);
         }
 
@@ -78,6 +92,8 @@ public class PointService {
 
     @Transactional(readOnly = true)
     public List<PointRankingResponseDto> getPointRanking(Pageable pageable) {
+        log.debug("포인트 랭킹 조회: page={}", pageable.getPageNumber());
+        
         List<Point> rankings = pointRepository.findAll(pageable).getContent();
 
         List<Long> userIds = rankings.stream()
