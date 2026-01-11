@@ -1,6 +1,7 @@
 package woobl0g.boardservice.comment.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import woobl0g.boardservice.global.response.ResponseCode;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -32,6 +34,8 @@ public class CommentService {
 
     @Transactional
     public void create(Long boardId, CreateCommentRequestDto dto, Long userId) {
+        log.info("댓글 생성 시작: boardId={}, userId={}, parentId={}", boardId, userId, dto.getParentId());
+        
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardException(ResponseCode.BOARD_NOT_FOUND));
 
@@ -49,10 +53,14 @@ public class CommentService {
 
         CommentCreatedEvent commentCreatedEvent = new CommentCreatedEvent(userId, "COMMENT_CREATE");
         kafkaTemplate.send("comment.created", commentCreatedEvent.toJson());
+        
+        log.info("댓글 생성 완료 및 이벤트 발행: commentId={}, userId={}", comment.getCommentId(), userId);
     }
 
     @Transactional(readOnly = true)
     public List<CommentResponseDto> getComments(Long boardId) {
+        log.debug("댓글 목록 조회: boardId={}", boardId);
+        
         return commentRepository.findByBoardIdWithReplies(boardId).stream()
                 .map(CommentResponseDto::from)
                 .toList();
@@ -60,34 +68,46 @@ public class CommentService {
 
     @Transactional
     public void delete(Long commentId, Long userId) {
+        log.info("댓글 삭제 시도: commentId={}, userId={}", commentId, userId);
+        
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentException(ResponseCode.COMMENT_NOT_FOUND));
 
         if(!comment.getUser().getUserId().equals(userId)) {
+            log.warn("댓글 삭제 권한 없음: commentId={}, userId={}", commentId, userId);
             throw new CommentException(ResponseCode.COMMENT_DELETE_FORBIDDEN);
         }
         if (!comment.canModify()) {
+            log.warn("댓글 수정 기간 미달: commentId={}", commentId);
             throw new CommentException(ResponseCode.COMMENT_MODIFY_TOO_EARLY);
         }
 
         if (!comment.getChildren().isEmpty()) {
             comment.softDelete();
+            log.info("댓글 소프트 삭제 완료: commentId={}", commentId);
         } else {
             commentRepository.delete(comment);
+            log.info("댓글 삭제 완료: commentId={}", commentId);
         }
     }
 
     @Transactional
     public void update(Long commentId, UpdateCommentRequestDto dto, Long userId) {
+        log.info("댓글 수정 시도: commentId={}, userId={}", commentId, userId);
+        
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentException(ResponseCode.COMMENT_NOT_FOUND));
+        
         if(!comment.getUser().getUserId().equals(userId)) {
+            log.warn("댓글 수정 권한 없음: commentId={}, userId={}", commentId, userId);
             throw new CommentException(ResponseCode.COMMENT_UPDATE_FORBIDDEN);
         }
         if(!comment.canModify()) {
+            log.warn("댓글 수정 기간 미달: commentId={}", commentId);
             throw new CommentException(ResponseCode.COMMENT_MODIFY_TOO_EARLY);
         }
 
         comment.update(dto.getContent());
+        log.info("댓글 수정 완료: commentId={}", commentId);
     }
 }

@@ -30,15 +30,21 @@ public class BoardService {
 
     @Transactional
     public void create(CreateBoardRequestDto dto, Long userId) {
+        log.info("게시글 생성 시작: userId={}, title={}", userId, dto.getTitle());
+        
         Board board = Board.create(dto.getTitle(), dto.getContent(), userId);
         boardRepository.save(board);
 
         BoardCreatedEvent boardCreatedEvent = BoardCreatedEvent.of(userId, "BOARD_CREATE");
         kafkaTemplate.send("board.created", boardCreatedEvent.toJson());
+        
+        log.info("게시글 생성 완료 및 이벤트 발행: boardId={}, userId={}", board.getBoardId(), userId);
     }
 
     @Transactional(readOnly = true)
     public BoardResponseDto getBoard(Long boardId) {
+        log.debug("게시글 조회: boardId={}", boardId);
+        
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardException(ResponseCode.BOARD_NOT_FOUND));
 
@@ -52,6 +58,8 @@ public class BoardService {
 
     @Transactional(readOnly = true)
     public List<BoardResponseDto> getBoards() {
+        log.debug("전체 게시글 조회 시작");
+        
         List<Board> boards = boardRepository.findAll();
 
         List<Long> userIds = boards.stream()
@@ -76,6 +84,8 @@ public class BoardService {
 
     @Transactional(readOnly = true)
     public BoardResponseDto getBoard2(Long boardId) {
+        log.debug("게시글 조회(동기화된 사용자): boardId={}", boardId);
+        
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardException(ResponseCode.BOARD_NOT_FOUND));
 
@@ -86,6 +96,8 @@ public class BoardService {
 
     @Transactional(readOnly = true)
     public PageResponse<BoardResponseDto> getBoards2(String keyword, SearchType searchType, Pageable pageable) {
+        log.debug("게시글 검색: keyword={}, searchType={}, page={}", keyword, searchType, pageable.getPageNumber());
+        
         Page<Board> boards;
 
         if (keyword == null || searchType == null) {
@@ -112,29 +124,41 @@ public class BoardService {
 
     @Transactional
     public void delete(Long boardId, Long userId) {
+        log.info("게시글 삭제 시도: boardId={}, userId={}", boardId, userId);
+        
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardException(ResponseCode.BOARD_NOT_FOUND));
+        
         if(!board.getUser().getUserId().equals(userId)) {
+            log.warn("게시글 삭제 권한 없음: boardId={}, userId={}", boardId, userId);
             throw new BoardException(ResponseCode.BOARD_DELETE_FORBIDDEN);
         }
         if (!board.canModify()) {
+            log.warn("게시글 수정 기간 미달: boardId={}", boardId);
             throw new BoardException(ResponseCode.BOARD_MODIFY_TOO_EARLY);
         }
 
         boardRepository.delete(board);
+        log.info("게시글 삭제 완료: boardId={}", boardId);
     }
 
     @Transactional
     public void update(Long boardId, UpdateBoardRequestDto dto, Long userId) {
+        log.info("게시글 수정 시도: boardId={}, userId={}", boardId, userId);
+        
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardException(ResponseCode.BOARD_NOT_FOUND));
+        
         if(!board.getUser().getUserId().equals(userId)) {
+            log.warn("게시글 수정 권한 없음: boardId={}, userId={}", boardId, userId);
             throw new BoardException(ResponseCode.BOARD_UPDATE_FORBIDDEN);
         }
         if(!board.canModify()) {
+            log.warn("게시글 수정 기간 미달: boardId={}", boardId);
             throw new BoardException(ResponseCode.BOARD_MODIFY_TOO_EARLY);
         }
 
         board.update(dto.getTitle(), dto.getContent());
+        log.info("게시글 수정 완료: boardId={}", boardId);
     }
 }

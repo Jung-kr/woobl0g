@@ -42,7 +42,8 @@ public enum ResponseCode {
     BOARD_CREATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "게시글 생성에 실패했습니다."),
     JSON_SERIALIZATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "JSON 직렬화에 실패했습니다."),
     JSON_DESERIALIZATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "JSON 역직렬화에 실패했습니다."),
-    USER_SYNC_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "사용자 동기화에 실패했습니다.");
+    USER_SYNC_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "사용자 동기화에 실패했습니다."),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
 
     private final HttpStatus status;
     private final String message;
