@@ -42,11 +42,7 @@ public class PointAdminService {
         PointFailureHistory pointFailureHistory = pointFailureHistoryRepository.findById(failureId)
                 .orElseThrow(() -> new PointException(ResponseCode.ADMIN_POINT_FAILURE_NOT_FOUND));
 
-        if (pointFailureHistory.getStatus() != FailureStatus.PENDING) {
-            log.warn("포인트 재처리 실패 - 이미 처리됨: failureId={}, status={}", 
-                    failureId, pointFailureHistory.getStatus());
-            throw new PointException(ResponseCode.ADMIN_POINT_FAILURE_ALREADY_PROCESSED);
-        }
+        pointFailureHistory.validateRetryable();
 
         AddPointRequestDto dto = AddPointRequestDto.of(
                 pointFailureHistory.getUserId(),

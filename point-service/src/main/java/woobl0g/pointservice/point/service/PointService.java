@@ -36,22 +36,14 @@ public class PointService {
         Point point = pointRepository.findByUserId(dto.getUserId())
                 .orElseGet(() -> {
                     log.info("신규 포인트 엔티티 생성: userId={}", dto.getUserId());
-                    return pointRepository.save(Point.create(dto.getUserId(), 0));
+                    return pointRepository.save(Point.create(dto.getUserId()));
                 });
 
-        int pointChange = dto.getActionType().getAmount();
-        String reason = dto.getActionType().name();
-
-        point.addAmount(pointChange);
+        PointHistory pointHistory = point.addAmount(dto.getActionType());
 
         // 포인트 이력 저장
-        pointHistoryRepository.save(PointHistory.create(
-                dto.getUserId(),
-                pointChange,
-                reason
-        ));
-        
-        log.info("포인트 적립 완료: userId={}, amount={}, reason={}", dto.getUserId(), pointChange, reason);
+        pointHistoryRepository.save(pointHistory);
+        log.info("포인트 적립 완료: userId={}", dto.getUserId());
     }
 
     @Transactional
@@ -61,19 +53,11 @@ public class PointService {
         Point point = pointRepository.findByUserId(dto.getUserId())
                 .orElseThrow(() -> new PointException(ResponseCode.POINT_NOT_FOUND));
 
-        int pointChange = -dto.getActionType().getAmount();
-        String reason = dto.getActionType().name();
-
-        point.deductAmount(dto.getActionType().getAmount());
+        PointHistory pointHistory = point.deductAmount(dto.getActionType());
 
         // 포인트 이력 저장
-        pointHistoryRepository.save(PointHistory.create(
-                dto.getUserId(),
-                pointChange,
-                reason
-        ));
-        
-        log.info("포인트 차감 완료: userId={}, amount={}, reason={}", dto.getUserId(), pointChange, reason);
+        pointHistoryRepository.save(pointHistory);
+        log.info("포인트 차감 완료: userId={}", dto.getUserId());
     }
 
     @Transactional(readOnly = true)
