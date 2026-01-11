@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import woobl0g.boardservice.comment.domain.Comment;
+import woobl0g.boardservice.global.exception.BoardException;
+import woobl0g.boardservice.global.response.ResponseCode;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -44,10 +46,6 @@ public class Board {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public boolean canModify() {
-        return ChronoUnit.DAYS.between(createdAt, LocalDateTime.now()) >= 1;
-    }
-
     public static Board create(String title, String content, Long userId) {
         return new Board(title, content, userId);
     }
@@ -56,5 +54,21 @@ public class Board {
         if (title != null) this.title = title;
         if (content != null) this.content = content;
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public boolean canModify() {
+        return ChronoUnit.DAYS.between(createdAt, LocalDateTime.now()) >= 1;
+    }
+
+    public void validateOwnership(Long requestUserId) {
+        if (!userId.equals(requestUserId)) {
+            throw new BoardException(ResponseCode.BOARD_MODIFY_FORBIDDEN);
+        }
+    }
+
+    public void validateModifiable() {
+        if (!canModify()) {
+            throw new BoardException(ResponseCode.BOARD_MODIFY_TOO_EARLY);
+        }
     }
 }

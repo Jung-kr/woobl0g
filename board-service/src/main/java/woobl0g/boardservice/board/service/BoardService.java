@@ -128,15 +128,9 @@ public class BoardService {
         
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardException(ResponseCode.BOARD_NOT_FOUND));
-        
-        if(!board.getUser().getUserId().equals(userId)) {
-            log.warn("게시글 삭제 권한 없음: boardId={}, userId={}", boardId, userId);
-            throw new BoardException(ResponseCode.BOARD_DELETE_FORBIDDEN);
-        }
-        if (!board.canModify()) {
-            log.warn("게시글 수정 기간 미달: boardId={}", boardId);
-            throw new BoardException(ResponseCode.BOARD_MODIFY_TOO_EARLY);
-        }
+
+        board.validateOwnership(userId);
+        board.validateModifiable();
 
         boardRepository.delete(board);
         log.info("게시글 삭제 완료: boardId={}", boardId);
@@ -148,15 +142,9 @@ public class BoardService {
         
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardException(ResponseCode.BOARD_NOT_FOUND));
-        
-        if(!board.getUser().getUserId().equals(userId)) {
-            log.warn("게시글 수정 권한 없음: boardId={}, userId={}", boardId, userId);
-            throw new BoardException(ResponseCode.BOARD_UPDATE_FORBIDDEN);
-        }
-        if(!board.canModify()) {
-            log.warn("게시글 수정 기간 미달: boardId={}", boardId);
-            throw new BoardException(ResponseCode.BOARD_MODIFY_TOO_EARLY);
-        }
+
+        board.validateOwnership(userId);
+        board.validateModifiable();
 
         board.update(dto.getTitle(), dto.getContent());
         log.info("게시글 수정 완료: boardId={}", boardId);

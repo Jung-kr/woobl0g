@@ -73,16 +73,10 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentException(ResponseCode.COMMENT_NOT_FOUND));
 
-        if(!comment.getUser().getUserId().equals(userId)) {
-            log.warn("댓글 삭제 권한 없음: commentId={}, userId={}", commentId, userId);
-            throw new CommentException(ResponseCode.COMMENT_DELETE_FORBIDDEN);
-        }
-        if (!comment.canModify()) {
-            log.warn("댓글 수정 기간 미달: commentId={}", commentId);
-            throw new CommentException(ResponseCode.COMMENT_MODIFY_TOO_EARLY);
-        }
+        comment.validateOwnership(userId);
+        comment.validateModifiable();
 
-        if (!comment.getChildren().isEmpty()) {
+        if (comment.shouldSoftDelete()) {
             comment.softDelete();
             log.info("댓글 소프트 삭제 완료: commentId={}", commentId);
         } else {
@@ -97,15 +91,9 @@ public class CommentService {
         
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentException(ResponseCode.COMMENT_NOT_FOUND));
-        
-        if(!comment.getUser().getUserId().equals(userId)) {
-            log.warn("댓글 수정 권한 없음: commentId={}, userId={}", commentId, userId);
-            throw new CommentException(ResponseCode.COMMENT_UPDATE_FORBIDDEN);
-        }
-        if(!comment.canModify()) {
-            log.warn("댓글 수정 기간 미달: commentId={}", commentId);
-            throw new CommentException(ResponseCode.COMMENT_MODIFY_TOO_EARLY);
-        }
+
+        comment.validateOwnership(userId);
+        comment.validateModifiable();
 
         comment.update(dto.getContent());
         log.info("댓글 수정 완료: commentId={}", commentId);
