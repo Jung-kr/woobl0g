@@ -18,10 +18,11 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/points")
-public class PointControllerImpl {
+public class PointControllerImpl implements PointController {
 
     private final PointService pointService;
 
+    @Override
     @GetMapping("/history")
     public ResponseEntity<ApiResponse<PageResponse<PointHistoryResponseDto>>> getPointHistory(
             @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
@@ -32,6 +33,7 @@ public class PointControllerImpl {
                 .body(ApiResponse.success(ResponseCode.POINT_HISTORY_GET_SUCCESS, pointService.getPointHistory(userId, pageable)));
     }
 
+    @Override
     @GetMapping("/ranking")
     public ResponseEntity<ApiResponse<List<PointRankingResponseDto>>> getPointRanking(
             @PageableDefault(page = 0, size = 10, sort = "amount", direction = Sort.Direction.DESC) Pageable pageable
