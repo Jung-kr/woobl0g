@@ -16,6 +16,8 @@ spring:
 client:
   user-service:
     url: ${USER_SERVICE_URL}
+  api-gateway-service:
+    url: ${API_GATEWAY_SERVICE_URL}
 
 logging:
   level:

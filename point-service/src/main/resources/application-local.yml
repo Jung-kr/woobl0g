@@ -16,6 +16,8 @@ spring:
 client:
   user-service:
     url: http://localhost:8080
+  api-gateway-service:
+    url: http://localhost:8000
 
 logging:
   level:
