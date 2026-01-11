@@ -16,10 +16,11 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/boards/{boardId}/comments")
-public class CommentControllerImpl {
+public class CommentControllerImpl implements CommentController {
 
     private final CommentService commentService;
 
+    @Override
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> create(
             @PathVariable Long boardId,
@@ -31,6 +32,7 @@ public class CommentControllerImpl {
                 .body(ApiResponse.success(ResponseCode.COMMENT_CREATED));
     }
 
+    @Override
     @DeleteMapping("/{commentId}")
     public ResponseEntity<ApiResponse<Void>> delete(
             @PathVariable Long commentId,
@@ -41,6 +43,7 @@ public class CommentControllerImpl {
                 .body(ApiResponse.success(ResponseCode.COMMENT_DELETE_SUCCESS));
     }
 
+    @Override
     @PatchMapping("/{commentId}")
     public ResponseEntity<ApiResponse<Void>> update(
             @PathVariable Long commentId,
@@ -52,6 +55,7 @@ public class CommentControllerImpl {
                 .body(ApiResponse.success(ResponseCode.COMMENT_UPDATE_SUCCESS));
     }
 
+    @Override
     @GetMapping
     public ResponseEntity<ApiResponse<List<CommentResponseDto>>> getComments(@PathVariable Long boardId) {
         return ResponseEntity

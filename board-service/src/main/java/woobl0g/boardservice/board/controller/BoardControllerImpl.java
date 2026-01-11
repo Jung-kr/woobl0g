@@ -22,6 +22,7 @@ public class BoardControllerImpl implements BoardController {
 
     private final BoardService boardService;
 
+    @Override
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> create(
             @Valid @RequestBody CreateBoardRequestDto dto,
@@ -32,6 +33,7 @@ public class BoardControllerImpl implements BoardController {
                 .body(ApiResponse.success(ResponseCode.BOARD_CREATED));
     }
 
+    @Override
     @DeleteMapping("/{boardId}")
     public ResponseEntity<ApiResponse<Void>> delete(
             @PathVariable Long boardId,
@@ -42,6 +44,7 @@ public class BoardControllerImpl implements BoardController {
                 .body(ApiResponse.success(ResponseCode.BOARD_DELETE_SUCCESS));
     }
 
+    @Override
     @PatchMapping("/{boardId}")
     public ResponseEntity<ApiResponse<Void>> update(
             @PathVariable Long boardId,
@@ -53,6 +56,7 @@ public class BoardControllerImpl implements BoardController {
                 .body(ApiResponse.success(ResponseCode.BOARD_UPDATE_SUCCESS));
     }
 
+    @Override
     @GetMapping("/{boardId}")
     public ResponseEntity<ApiResponse<BoardResponseDto>> getBoard(@PathVariable Long boardId) {
         return ResponseEntity
@@ -61,6 +65,7 @@ public class BoardControllerImpl implements BoardController {
                 .body(ApiResponse.success(ResponseCode.BOARD_GET_SUCCESS, boardService.getBoard2(boardId)));
     }
 
+    @Override
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<BoardResponseDto>>> getBoards(
             @RequestParam(required = false) String keyword,
