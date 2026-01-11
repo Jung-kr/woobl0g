@@ -20,6 +20,8 @@ spring:
 client:
   point-service:
     url: http://localhost:8082
+  api-gateway-service:
+    url: http://localhost:8000
 
 jwt:
   secret-key: woo120-secret-1234-1234-1234-1234
