@@ -22,10 +22,11 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Transactional
-    public void signUp(SignUpRequestDto dto, PasswordEncoder passwordEncoder) {
+    public void signUp(SignUpRequestDto dto) {
         log.debug("회원가입 처리 시작: email={}", dto.getEmail());
 
         if (userRepository.existsByEmail(dto.getEmail())) {

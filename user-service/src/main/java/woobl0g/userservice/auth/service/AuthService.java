@@ -31,7 +31,7 @@ public class AuthService {
     @Transactional
     public void signUp(SignUpRequestDto dto) {
         log.info("회원가입 시도: email={}", dto.getEmail());
-        userService.signUp(dto, passwordEncoder);
+        userService.signUp(dto);
         log.info("회원가입 완료: email={}", dto.getEmail());
     }
 
@@ -40,11 +40,7 @@ public class AuthService {
         log.info("로그인 시도: email={}", dto.getEmail());
         
         User user = userService.getUserByEmail(dto.getEmail());
-
-        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-            log.warn("로그인 실패 - 비밀번호 불일치: email={}", dto.getEmail());
-            throw new UserException(ResponseCode.INVALID_CREDENTIALS);
-        }
+        user.validatePassword(dto.getPassword(), passwordEncoder);
 
         String accessToken = jwtTokenProvider.createAccessToken(user.getUserId(), user.getRole());
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getUserId());
