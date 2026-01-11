@@ -9,3 +9,16 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: user-service
+        url: /v3/api-docs/user-service
+      - name: board-service
+        url: /v3/api-docs/board-service
+      - name: point-service
+        url: /v3/api-docs/point-service
+    path: /swagger-ui.html
+  api-docs:
+    enabled: true
