@@ -1,6 +1,7 @@
 package woobl0g.pointservice.point.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +11,7 @@ import woobl0g.pointservice.point.domain.FailureStatus;
 import woobl0g.pointservice.point.domain.PointActionType;
 import woobl0g.pointservice.point.domain.PointFailureHistory;
 import woobl0g.pointservice.point.dto.AddPointRequestDto;
+import woobl0g.pointservice.point.dto.PageResponse;
 import woobl0g.pointservice.point.dto.PointFailureHistoryResponseDto;
 import woobl0g.pointservice.point.repository.PointFailureHistoryRepository;
 
@@ -23,11 +25,10 @@ public class PointAdminService {
     private final PointFailureHistoryRepository pointFailureHistoryRepository;
 
     @Transactional(readOnly = true)
-    public List<PointFailureHistoryResponseDto> getFailureHistories(Pageable pageable) {
-        return pointFailureHistoryRepository.findAllByStatus(FailureStatus.PENDING, pageable)
-                .stream()
-                .map(PointFailureHistoryResponseDto::from)
-                .toList();
+    public PageResponse<PointFailureHistoryResponseDto> getFailureHistories(Pageable pageable) {
+        Page<PointFailureHistory> failureHistories = pointFailureHistoryRepository.findAllByStatus(FailureStatus.PENDING, pageable);
+
+        return PageResponse.of(failureHistories.map(PointFailureHistoryResponseDto::from));
     }
 
     @Transactional

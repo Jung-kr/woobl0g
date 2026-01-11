@@ -66,16 +66,14 @@ public class PointService {
     }
 
     @Transactional(readOnly = true)
-    public List<PointHistoryResponseDto> getPointHistory(Long userId) {
+    public PageResponse<PointHistoryResponseDto> getPointHistory(Long userId, Pageable pageable) {
         if (!pointRepository.existsByUserId(userId)) {
             throw new PointException(ResponseCode.POINT_NOT_FOUND);
         }
 
-        List<PointHistory> histories = pointHistoryRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        Page<PointHistory> histories = pointHistoryRepository.findByUserId(userId, pageable);
 
-        return histories.stream()
-                .map(PointHistoryResponseDto::from)
-                .toList();
+        return PageResponse.of(histories.map(PointHistoryResponseDto::from));
     }
 
     @Transactional(readOnly = true)

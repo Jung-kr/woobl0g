@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import woobl0g.pointservice.global.response.ApiResponse;
 import woobl0g.pointservice.global.response.ResponseCode;
+import woobl0g.pointservice.point.dto.PageResponse;
 import woobl0g.pointservice.point.dto.PointFailureHistoryResponseDto;
 import woobl0g.pointservice.point.service.PointAdminService;
 
@@ -22,7 +23,7 @@ public class PointAdminController {
     private final PointAdminService pointAdminService;
 
     @GetMapping("/failures")
-    public ResponseEntity<ApiResponse<List<PointFailureHistoryResponseDto>>> getFailureHistories(
+    public ResponseEntity<ApiResponse<PageResponse<PointFailureHistoryResponseDto>>> getFailureHistories(
             @PageableDefault(page = 0, size = 10, sort = "failedAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity
