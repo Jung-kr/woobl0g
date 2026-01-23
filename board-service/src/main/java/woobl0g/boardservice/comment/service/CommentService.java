@@ -15,6 +15,7 @@ import woobl0g.boardservice.comment.dto.CommentResponseDto;
 import woobl0g.boardservice.comment.dto.CreateCommentRequestDto;
 import woobl0g.boardservice.comment.event.CommentCreatedEvent;
 import woobl0g.boardservice.comment.repository.CommentRepository;
+import woobl0g.boardservice.global.aop.QueryCountLogging;
 import woobl0g.boardservice.global.exception.BoardException;
 import woobl0g.boardservice.global.exception.CommentException;
 import woobl0g.boardservice.global.exception.UserException;
@@ -57,6 +58,7 @@ public class CommentService {
         log.info("댓글 생성 완료 및 이벤트 발행: commentId={}, userId={}", comment.getCommentId(), userId);
     }
 
+    @QueryCountLogging
     @Transactional(readOnly = true)
     public List<CommentResponseDto> getComments(Long boardId) {
         log.debug("댓글 목록 조회: boardId={}", boardId);
