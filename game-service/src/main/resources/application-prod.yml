@@ -2,6 +2,14 @@ spring:
   config:
     activate:
       on-profile: prod
+  datasource:
+    url: ${GAME_DB_URL}
+    username: ${GAME_DB_USERNAME}
+    password: ${GAME_DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
 
 logging:
   level:
