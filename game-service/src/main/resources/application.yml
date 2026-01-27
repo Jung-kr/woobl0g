@@ -4,6 +4,13 @@ server:
 spring:
   profiles:
     active: local
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+external:
+  urls:
+    kbo:
+      schedule: https://www.koreabaseball.com/Schedule/Schedule.aspx
 
 logging:
   pattern:

@@ -23,14 +23,22 @@ services:
     ports:
       - '3309:3306'
 
+  game-db:
+    image: mysql:8.0
+    container_name: woobl0g-game-db
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+    ports:
+      - '3310:3306'
+
   redis:
     image: redis:7-alpine
     container_name: woobl0g-redis
     ports:
-      - "6379:6379"
+      - '6379:6379'
 
   kafka:
     image: apache/kafka:4.1.0
     container_name: woobl0g-kafka
     ports:
-      - "9092:9092"
+      - '9092:9092'
