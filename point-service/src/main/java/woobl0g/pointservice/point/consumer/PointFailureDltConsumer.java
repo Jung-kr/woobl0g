@@ -5,9 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import woobl0g.pointservice.point.domain.PointFailureHistory;
-import woobl0g.pointservice.point.event.BoardCreatedEvent;
-import woobl0g.pointservice.point.event.CommentCreatedEvent;
-import woobl0g.pointservice.point.event.UserSignedUpEvent;
+import woobl0g.pointservice.point.event.*;
 import woobl0g.pointservice.point.repository.PointFailureHistoryRepository;
 
 @Slf4j
@@ -56,6 +54,34 @@ public class PointFailureDltConsumer {
             log.info("댓글 생성 실패 이력 저장 완료: userId={}", event.getUserId());
         } catch (Exception e) {
             log.error("댓글 생성 DLT 처리 실패 - PointFailureHistory 저장 오류: message={}", message, e);
+        }
+    }
+
+    @KafkaListener(topics = "bet.cancelled.dlt", groupId = "point-service")
+    public void consumeBetCancelled(String message) {
+        log.warn("베팅 취소 포인트 적립 실패 - DLT 처리: message={}", message);
+
+        try {
+            BetCancelledEvent event = BetCancelledEvent.fromJson(message);
+            pointFailureHistoryRepository.save(PointFailureHistory.create(event.getUserId(), event.getActionType(), event.getAmount()));
+
+            log.info("베팅 취소 실패 이력 저장 완료: userId={}", event.getUserId());
+        } catch (Exception e) {
+            log.error("베팅 취소 DLT 처리 실패 - PointFailureHistory 저장 오류: message={}", message, e);
+        }
+    }
+
+    @KafkaListener(topics = "bet.settled.dlt", groupId = "point-service")
+    public void consumeBetSettled(String message) {
+        log.warn("베팅 정산 포인트 적립 실패 - DLT 처리: message={}", message);
+
+        try {
+            BetSettledEvent event = BetSettledEvent.fromJson(message);
+            pointFailureHistoryRepository.save(PointFailureHistory.create(event.getUserId(), event.getActionType(), event.getAmount()));
+
+            log.info("베팅 정산 실패 이력 저장 완료: userId={}", event.getUserId());
+        } catch (Exception e) {
+            log.error("베팅 정산 DLT 처리 실패 - PointFailureHistory 저장 오류: message={}", message, e);
         }
     }
 }
