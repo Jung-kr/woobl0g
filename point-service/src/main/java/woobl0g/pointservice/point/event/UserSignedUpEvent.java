@@ -17,6 +17,7 @@ public class UserSignedUpEvent {
     private String name;
     private String email;
     private String actionType;
+    private Integer amount;
 
     public static UserSignedUpEvent fromJson(String json) {
         try {

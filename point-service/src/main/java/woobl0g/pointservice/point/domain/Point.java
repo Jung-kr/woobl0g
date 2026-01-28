@@ -29,15 +29,13 @@ public class Point {
     }
 
     // 포인트 적립
-    public PointHistory addAmount(PointActionType actionType) {
-        int amount = actionType.getAmount();
+    public PointHistory addAmount(PointActionType actionType, Integer amount) {
         this.amount += amount;
         return PointHistory.create(userId, amount, actionType.name());
     }
 
     // 포인트 차감
-    public PointHistory deductAmount(PointActionType actionType) {
-        int amount = actionType.getAmount();
+    public PointHistory deductAmount(PointActionType actionType, Integer amount) {
         if (this.amount < amount) {
             throw new PointException(ResponseCode.INSUFFICIENT_POINT);
         }

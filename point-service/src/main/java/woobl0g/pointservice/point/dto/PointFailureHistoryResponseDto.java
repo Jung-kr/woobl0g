@@ -14,6 +14,7 @@ public class PointFailureHistoryResponseDto {
     private Long id;
     private Long userId;
     private String actionType;
+    private Integer amount;
     private FailureStatus status;
     private LocalDateTime failedAt;
     private LocalDateTime resolvedAt;
@@ -23,6 +24,7 @@ public class PointFailureHistoryResponseDto {
                 pointFailureHistory.getId(),
                 pointFailureHistory.getUserId(),
                 pointFailureHistory.getActionType(),
+                pointFailureHistory.getAmount(),
                 pointFailureHistory.getStatus(),
                 pointFailureHistory.getFailedAt(),
                 pointFailureHistory.getResolvedAt()

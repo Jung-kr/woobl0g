@@ -23,7 +23,7 @@ public class PointFailureDltConsumer {
         
         try {
             UserSignedUpEvent event = UserSignedUpEvent.fromJson(message);
-            pointFailureHistoryRepository.save(PointFailureHistory.create(event.getUserId(), event.getActionType()));
+            pointFailureHistoryRepository.save(PointFailureHistory.create(event.getUserId(), event.getActionType(), event.getAmount()));
             
             log.info("회원가입 실패 이력 저장 완료: userId={}", event.getUserId());
         } catch (Exception e) {
@@ -37,7 +37,7 @@ public class PointFailureDltConsumer {
         
         try {
             BoardCreatedEvent event = BoardCreatedEvent.fromJson(message);
-            pointFailureHistoryRepository.save(PointFailureHistory.create(event.getUserId(), event.getActionType()));
+            pointFailureHistoryRepository.save(PointFailureHistory.create(event.getUserId(), event.getActionType(), event.getAmount()));
             
             log.info("게시글 생성 실패 이력 저장 완료: userId={}", event.getUserId());
         } catch (Exception e) {
@@ -51,7 +51,7 @@ public class PointFailureDltConsumer {
         
         try {
             CommentCreatedEvent event = CommentCreatedEvent.fromJson(message);
-            pointFailureHistoryRepository.save(PointFailureHistory.create(event.getUserId(), event.getActionType()));
+            pointFailureHistoryRepository.save(PointFailureHistory.create(event.getUserId(), event.getActionType(), event.getAmount()));
             
             log.info("댓글 생성 실패 이력 저장 완료: userId={}", event.getUserId());
         } catch (Exception e) {

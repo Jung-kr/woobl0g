@@ -32,7 +32,7 @@ class PointTest {
         PointActionType actionType = PointActionType.SIGN_UP;
 
         // when
-        PointHistory history = point.addAmount(actionType);
+        PointHistory history = point.addAmount(actionType, 100);
 
         // then
         assertThat(point.getAmount()).isEqualTo(100);
@@ -46,10 +46,10 @@ class PointTest {
     void deductAmount() {
         // given
         Point point = Point.create(1L);
-        point.addAmount(PointActionType.SIGN_UP); // 100 포인트 적립
+        point.addAmount(PointActionType.SIGN_UP, 100); // 100 포인트 적립
 
         // when
-        PointHistory history = point.deductAmount(PointActionType.BOARD_DELETE);
+        PointHistory history = point.deductAmount(PointActionType.BOARD_DELETE, 10);
 
         // then
         assertThat(point.getAmount()).isEqualTo(90);
@@ -63,11 +63,11 @@ class PointTest {
 
         // given
         Point point = Point.create(1L);
-        point.addAmount(PointActionType.COMMENT_CREATE); // 5 포인트만 적립
+        point.addAmount(PointActionType.COMMENT_CREATE, 5); // 5 포인트만 적립
         PointActionType actionType = PointActionType.BOARD_DELETE; // 10 포인트 차감 시도
 
         // when & then
-        assertThatThrownBy(() -> point.deductAmount(actionType))
+        assertThatThrownBy(() -> point.deductAmount(actionType, 10))
                 .isInstanceOf(PointException.class)
                 .hasFieldOrPropertyWithValue("code", ResponseCode.INSUFFICIENT_POINT);
     }

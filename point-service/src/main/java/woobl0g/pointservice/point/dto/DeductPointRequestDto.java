@@ -10,8 +10,9 @@ public class DeductPointRequestDto {
 
     private Long userId;
     private PointActionType actionType;
+    private Integer amount;
 
-    public static DeductPointRequestDto of(Long userId, PointActionType actionType) {
-        return new DeductPointRequestDto(userId, actionType);
+    public static DeductPointRequestDto of(Long userId, PointActionType actionType, Integer amount) {
+        return new DeductPointRequestDto(userId, actionType, amount);
     }
 }
