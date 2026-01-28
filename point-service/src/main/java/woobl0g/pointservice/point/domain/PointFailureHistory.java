@@ -21,6 +21,7 @@ public class PointFailureHistory {
     private Long id;
     private Long userId;
     private String actionType;
+    private Integer amount;
 
     @Enumerated(EnumType.STRING)
     private FailureStatus status;
@@ -28,15 +29,16 @@ public class PointFailureHistory {
     private LocalDateTime failedAt;
     private LocalDateTime resolvedAt;
 
-    private PointFailureHistory(Long userId, String actionType) {
+    private PointFailureHistory(Long userId, String actionType, Integer amount) {
         this.userId = userId;
         this.actionType = actionType;
+        this.amount = amount;
         this.status = FailureStatus.PENDING;
         this.failedAt = LocalDateTime.now();
     }
 
-    public static PointFailureHistory create(Long userId, String actionType) {
-        return new PointFailureHistory(userId, actionType);
+    public static PointFailureHistory create(Long userId, String actionType, Integer amount) {
+        return new PointFailureHistory(userId, actionType, amount);
     }
 
     public void markAsResolved() {

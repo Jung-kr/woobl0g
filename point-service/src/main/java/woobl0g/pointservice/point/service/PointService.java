@@ -39,7 +39,7 @@ public class PointService {
                     return pointRepository.save(Point.create(dto.getUserId()));
                 });
 
-        PointHistory pointHistory = point.addAmount(dto.getActionType());
+        PointHistory pointHistory = point.addAmount(dto.getActionType(), dto.getAmount());
 
         // 포인트 이력 저장
         pointHistoryRepository.save(pointHistory);
@@ -53,7 +53,7 @@ public class PointService {
         Point point = pointRepository.findByUserId(dto.getUserId())
                 .orElseThrow(() -> new PointException(ResponseCode.POINT_NOT_FOUND));
 
-        PointHistory pointHistory = point.deductAmount(dto.getActionType());
+        PointHistory pointHistory = point.deductAmount(dto.getActionType(), dto.getAmount());
 
         // 포인트 이력 저장
         pointHistoryRepository.save(pointHistory);

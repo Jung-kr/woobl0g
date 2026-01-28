@@ -52,7 +52,7 @@ public class CommentService {
         Comment comment = Comment.create(dto.getContent(), board, user, parent);
         commentRepository.save(comment);
 
-        CommentCreatedEvent commentCreatedEvent = new CommentCreatedEvent(userId, "COMMENT_CREATE");
+        CommentCreatedEvent commentCreatedEvent = new CommentCreatedEvent(userId, "COMMENT_CREATE", 5);
         kafkaTemplate.send("comment.created", commentCreatedEvent.toJson());
         
         log.info("댓글 생성 완료 및 이벤트 발행: commentId={}, userId={}", comment.getCommentId(), userId);

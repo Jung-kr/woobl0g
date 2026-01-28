@@ -15,6 +15,7 @@ public class CommentCreatedEvent {
 
     private Long userId;
     private String actionType;
+    private Integer amount;
 
     public static CommentCreatedEvent fromJson(String json) {
         try {

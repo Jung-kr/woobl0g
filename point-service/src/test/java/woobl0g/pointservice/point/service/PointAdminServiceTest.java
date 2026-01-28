@@ -45,7 +45,7 @@ class PointAdminServiceTest {
     void getFailureHistories() {
         // given
         Pageable pageable = PageRequest.of(0, 10);
-        PointFailureHistory history = PointFailureHistory.create(1L, "SIGN_UP");
+        PointFailureHistory history = PointFailureHistory.create(1L, "SIGN_UP", 100);
         Page<PointFailureHistory> historyPage = new PageImpl<>(List.of(history), pageable, 1);
 
         when(pointFailureHistoryRepository.findAllByStatus(FailureStatus.PENDING, pageable)).thenReturn(historyPage);
@@ -65,7 +65,7 @@ class PointAdminServiceTest {
         // given
         Long failureId = 1L;
         Long userId = 1L;
-        PointFailureHistory history = PointFailureHistory.create(userId, "SIGN_UP");
+        PointFailureHistory history = PointFailureHistory.create(userId, "SIGN_UP", 100);
 
         when(pointFailureHistoryRepository.findById(failureId)).thenReturn(Optional.of(history));
         doNothing().when(pointService).addPoints(any(AddPointRequestDto.class));
@@ -101,7 +101,7 @@ class PointAdminServiceTest {
     void retryFailedPoint_alreadyProcessed() {
         // given
         Long failureId = 1L;
-        PointFailureHistory history = PointFailureHistory.create(1L, "SIGN_UP");
+        PointFailureHistory history = PointFailureHistory.create(1L, "SIGN_UP", 100);
         history.markAsResolved(); // 이미 처리됨
 
         when(pointFailureHistoryRepository.findById(failureId)).thenReturn(Optional.of(history));
@@ -119,7 +119,7 @@ class PointAdminServiceTest {
     void ignoreFailedPoint() {
         // given
         Long failureId = 1L;
-        PointFailureHistory history = PointFailureHistory.create(1L, "SIGN_UP");
+        PointFailureHistory history = PointFailureHistory.create(1L, "SIGN_UP", 100);
 
         when(pointFailureHistoryRepository.findById(failureId)).thenReturn(Optional.of(history));
 

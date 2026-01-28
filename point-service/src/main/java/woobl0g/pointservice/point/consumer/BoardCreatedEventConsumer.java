@@ -34,7 +34,7 @@ public class BoardCreatedEventConsumer {
         
         BoardCreatedEvent event = BoardCreatedEvent.fromJson(message);
 
-        AddPointRequestDto addPointRequestDto = AddPointRequestDto.of(event.getUserId(), PointActionType.valueOf(event.getActionType()));
+        AddPointRequestDto addPointRequestDto = AddPointRequestDto.of(event.getUserId(), PointActionType.valueOf(event.getActionType()), event.getAmount());
         pointService.addPoints(addPointRequestDto);
 
         log.info("게시글 생성 포인트 적립 완료: userId={}", addPointRequestDto.getUserId());

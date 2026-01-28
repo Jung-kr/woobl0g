@@ -15,6 +15,7 @@ public class BoardCreatedEvent {
 
     private Long userId;
     private String actionType;
+    private Integer amount;
 
     public static BoardCreatedEvent fromJson(String json) {
         try {

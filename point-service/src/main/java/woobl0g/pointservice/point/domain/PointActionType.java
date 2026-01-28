@@ -7,12 +7,16 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum PointActionType {
 
-    SIGN_UP(100),
-    BOARD_CREATE(10),
-    COMMENT_CREATE(5),
+    SIGN_UP,
+    BOARD_CREATE,
+    COMMENT_CREATE,
+    COMMENT_DELETE,
+    BOARD_DELETE,
 
-    COMMENT_DELETE(5),
-    BOARD_DELETE(10);
-
-    private final int amount;
+    // 배팅 관련
+    BET,
+    BET_CANCEL,
+    BET_WIN,
+    BET_LOSE,
+    BET_REFUND;
 }

@@ -17,13 +17,15 @@ class PointFailureHistoryTest {
         // given
         Long userId = 1L;
         String actionType = "SIGN_UP";
+        Integer amount = 100;
 
         // when
-        PointFailureHistory history = PointFailureHistory.create(userId, actionType);
+        PointFailureHistory history = PointFailureHistory.create(userId, actionType, amount);
 
         // then
         assertThat(history.getUserId()).isEqualTo(userId);
         assertThat(history.getActionType()).isEqualTo(actionType);
+        assertThat(history.getAmount()).isEqualTo(amount);
         assertThat(history.getStatus()).isEqualTo(FailureStatus.PENDING);
         assertThat(history.getFailedAt()).isNotNull();
         assertThat(history.getResolvedAt()).isNull();
@@ -33,7 +35,7 @@ class PointFailureHistoryTest {
     @DisplayName("실패 이력을 해결 처리하면 상태가 RESOLVED로 변경된다")
     void markAsResolved() {
         // given
-        PointFailureHistory history = PointFailureHistory.create(1L, "SIGN_UP");
+        PointFailureHistory history = PointFailureHistory.create(1L, "SIGN_UP", 100);
 
         // when
         history.markAsResolved();
@@ -47,7 +49,7 @@ class PointFailureHistoryTest {
     @DisplayName("실패 이력을 무시 처리하면 상태가 IGNORED로 변경된다")
     void markAsIgnored() {
         // given
-        PointFailureHistory history = PointFailureHistory.create(1L, "SIGN_UP");
+        PointFailureHistory history = PointFailureHistory.create(1L, "SIGN_UP", 100);
 
         // when
         history.markAsIgnored();
@@ -60,7 +62,7 @@ class PointFailureHistoryTest {
     @DisplayName("PENDING 상태일 때는 재처리 검증이 통과한다")
     void validateRetryable_pending() {
         // given
-        PointFailureHistory history = PointFailureHistory.create(1L, "SIGN_UP");
+        PointFailureHistory history = PointFailureHistory.create(1L, "SIGN_UP", 100);
 
         // when & then
         assertThatCode(() -> history.validateRetryable())
@@ -71,7 +73,7 @@ class PointFailureHistoryTest {
     @DisplayName("RESOLVED 상태일 때는 재처리 검증 시 예외가 발생한다")
     void validateRetryable_resolved() {
         // given
-        PointFailureHistory history = PointFailureHistory.create(1L, "SIGN_UP");
+        PointFailureHistory history = PointFailureHistory.create(1L, "SIGN_UP", 100);
         history.markAsResolved();
 
         // when & then
@@ -84,7 +86,7 @@ class PointFailureHistoryTest {
     @DisplayName("IGNORED 상태일 때는 재처리 검증 시 예외가 발생한다")
     void validateRetryable_ignored() {
         // given
-        PointFailureHistory history = PointFailureHistory.create(1L, "SIGN_UP");
+        PointFailureHistory history = PointFailureHistory.create(1L, "SIGN_UP", 100);
         history.markAsIgnored();
 
         // when & then

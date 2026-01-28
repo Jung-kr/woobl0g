@@ -13,6 +13,7 @@ public class BoardCreatedEvent {
 
     private Long userId;
     private String actionType;
+    private Integer amount;
 
     public String toJson() {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -23,7 +24,7 @@ public class BoardCreatedEvent {
         }
     }
 
-    public static BoardCreatedEvent of(Long userId, String actionType) {
-        return new BoardCreatedEvent(userId, actionType);
+    public static BoardCreatedEvent of(Long userId, String actionType, Integer amount) {
+        return new BoardCreatedEvent(userId, actionType, amount);
     }
 }

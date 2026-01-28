@@ -49,7 +49,7 @@ class PointServiceTest {
         // given
         Long userId = 1L;
         Point point = Point.create(userId);
-        AddPointRequestDto dto = AddPointRequestDto.of(userId, PointActionType.SIGN_UP);
+        AddPointRequestDto dto = AddPointRequestDto.of(userId, PointActionType.SIGN_UP, 100);
 
         when(pointRepository.findByUserId(userId)).thenReturn(Optional.of(point));
         when(pointHistoryRepository.save(any(PointHistory.class))).thenReturn(null);
@@ -69,7 +69,7 @@ class PointServiceTest {
         // given
         Long userId = 1L;
         Point point = Point.create(userId);
-        AddPointRequestDto dto = AddPointRequestDto.of(userId, PointActionType.SIGN_UP);
+        AddPointRequestDto dto = AddPointRequestDto.of(userId, PointActionType.SIGN_UP, 100);
 
         when(pointRepository.findByUserId(userId)).thenReturn(Optional.empty());
         when(pointRepository.save(any(Point.class))).thenReturn(point);
@@ -90,8 +90,8 @@ class PointServiceTest {
         // given
         Long userId = 1L;
         Point point = Point.create(1L);
-        point.addAmount(PointActionType.SIGN_UP);
-        DeductPointRequestDto dto = DeductPointRequestDto.of(userId, PointActionType.BOARD_DELETE);
+        point.addAmount(PointActionType.SIGN_UP, 100);
+        DeductPointRequestDto dto = DeductPointRequestDto.of(userId, PointActionType.BOARD_DELETE, 10);
 
         when(pointRepository.findByUserId(userId)).thenReturn(Optional.of(point));
         when(pointHistoryRepository.save(any(PointHistory.class))).thenReturn(null);
@@ -110,7 +110,7 @@ class PointServiceTest {
     void deductPoints_pointNotFound() {
         // given
         Long userId = 1L;
-        DeductPointRequestDto dto = DeductPointRequestDto.of(userId, PointActionType.BOARD_DELETE);
+        DeductPointRequestDto dto = DeductPointRequestDto.of(userId, PointActionType.BOARD_DELETE, 10);
 
         when(pointRepository.findByUserId(userId)).thenReturn(Optional.empty());
 
@@ -168,8 +168,8 @@ class PointServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         Point point1 = Point.create(1L);
         Point point2 = Point.create(2L);
-        point1.addAmount(PointActionType.SIGN_UP);
-        point2.addAmount(PointActionType.BOARD_CREATE);
+        point1.addAmount(PointActionType.SIGN_UP, 100);
+        point2.addAmount(PointActionType.BOARD_CREATE, 10);
 
         Page<Point> pointPage = new PageImpl<>(List.of(point1, point2), pageable, 2);
 

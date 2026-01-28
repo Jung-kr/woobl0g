@@ -17,6 +17,7 @@ public class UserSignedUpEvent {
     private String name;
     private String email;
     private String actionType;
+    private Integer amount;
 
     public String toJson() {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -27,7 +28,7 @@ public class UserSignedUpEvent {
         }
     }
 
-    public static UserSignedUpEvent of(Long userId, String name, String email, String actionType) {
-        return new UserSignedUpEvent(userId, name, email, actionType);
+    public static UserSignedUpEvent of(Long userId, String name, String email, String actionType, Integer amount) {
+        return new UserSignedUpEvent(userId, name, email, actionType, amount);
     }
 }

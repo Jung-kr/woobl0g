@@ -46,7 +46,8 @@ public class PointAdminService {
 
         AddPointRequestDto dto = AddPointRequestDto.of(
                 pointFailureHistory.getUserId(),
-                PointActionType.valueOf(pointFailureHistory.getActionType())
+                PointActionType.valueOf(pointFailureHistory.getActionType()),
+                pointFailureHistory.getAmount()
         );
         pointService.addPoints(dto);
         pointFailureHistory.markAsResolved();
