@@ -75,8 +75,8 @@ public class GameService {
     }
 
     @Transactional(readOnly = true)
-    public List<GameResponseDto> getGamesByDate(LocalDate date, Pageable pageable) {
-        List<Game> games = gameRepository.findByDate(date, pageable);
+    public List<GameResponseDto> getGamesByDate(LocalDate date) {
+        List<Game> games = gameRepository.findByDate(date);
 
         return games.stream()
                 .map(game -> {

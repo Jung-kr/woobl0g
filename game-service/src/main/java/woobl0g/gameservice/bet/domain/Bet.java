@@ -31,6 +31,7 @@ public class Bet {
     private Integer amount;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 20)
     private BetAction betAction;
 
     private LocalDateTime createdAt;

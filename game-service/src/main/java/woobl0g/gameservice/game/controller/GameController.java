@@ -24,12 +24,11 @@ public class GameController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<GameResponseDto>>> getGamesByDate(
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
-            @PageableDefault(page = 0, size = 10) Pageable pageable
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date
     ) {
         return ResponseEntity
                 .status(ResponseCode.GAME_LIST_GET_SUCCESS.getStatus())
-                .body(ApiResponse.success(ResponseCode.GAME_LIST_GET_SUCCESS, gameService.getGamesByDate(date, pageable)));
+                .body(ApiResponse.success(ResponseCode.GAME_LIST_GET_SUCCESS, gameService.getGamesByDate(date)));
     }
 
     @GetMapping("/{gameId}")

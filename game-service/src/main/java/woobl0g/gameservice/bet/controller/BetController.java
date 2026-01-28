@@ -7,7 +7,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import woobl0g.gameservice.bet.dto.BetResponseDto;
-import woobl0g.gameservice.bet.dto.CancelBetRequestDto;
 import woobl0g.gameservice.bet.dto.PlaceBetRequestDto;
 import woobl0g.gameservice.bet.service.BetService;
 import woobl0g.gameservice.global.response.ApiResponse;
@@ -22,23 +21,24 @@ public class BetController {
 
     private final BetService betService;
 
-    @PostMapping
+    @PostMapping("/games/{gameId}")
     public ResponseEntity<ApiResponse<Void>> placeBet(
             @RequestBody PlaceBetRequestDto placeBetRequestDto,
+            @PathVariable Long gameId,
             @RequestHeader("X-User-Id") Long userId
     ) {
-        betService.placeBet(userId, placeBetRequestDto);
+        betService.placeBet(userId, placeBetRequestDto, gameId);
         return ResponseEntity
                 .status(ResponseCode.BET_PLACED_SUCCESS.getStatus())
                 .body(ApiResponse.success(ResponseCode.BET_PLACED_SUCCESS));
     }
 
-    @DeleteMapping
+    @DeleteMapping("/games/{gameId}")
     public ResponseEntity<ApiResponse<Void>> cancelBet(
-            @RequestBody CancelBetRequestDto cancelBetRequestDto,
+            @PathVariable Long gameId,
             @RequestHeader("X-User-Id") Long userId
     ) {
-        betService.cancelBet(userId, cancelBetRequestDto);
+        betService.cancelBet(userId, gameId);
         return ResponseEntity
                 .status(ResponseCode.BET_CANCELLED_SUCCESS.getStatus())
                 .body(ApiResponse.success(ResponseCode.BET_CANCELLED_SUCCESS));
@@ -47,7 +47,7 @@ public class BetController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<BetResponseDto>>> getBets(
             @RequestHeader("X-User-Id") Long userId,
-            @PageableDefault(page = 0, size = 10, sort = "betDate", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity
                 .status(ResponseCode.BET_LIST_GET_SUCCESS.getStatus())

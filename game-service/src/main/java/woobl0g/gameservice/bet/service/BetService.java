@@ -12,7 +12,6 @@ import woobl0g.gameservice.bet.domain.Bet;
 import woobl0g.gameservice.bet.domain.BetAction;
 import woobl0g.gameservice.bet.domain.BetType;
 import woobl0g.gameservice.bet.dto.BetResponseDto;
-import woobl0g.gameservice.bet.dto.CancelBetRequestDto;
 import woobl0g.gameservice.bet.dto.PlaceBetRequestDto;
 import woobl0g.gameservice.bet.event.BetCancelledEvent;
 import woobl0g.gameservice.bet.event.BetSettledEvent;
@@ -43,8 +42,7 @@ public class BetService {
      * 배팅 생성 -> 보상 트랜잭션 & 포인트 차감 시 actionType 처리
      */
     @Transactional
-    public void placeBet(Long userId, PlaceBetRequestDto dto) {
-        Long gameId = dto.getGameId();
+    public void placeBet(Long userId, PlaceBetRequestDto dto, Long gameId) {
         BetType betType = dto.getBetType();
         Integer betAmount = dto.getBetAmount();
 
@@ -85,7 +83,7 @@ public class BetService {
             }
 
             // 4. 포인트 차감 (Point Service 호출)
-            pointClient.deductPoints(userId, betType.name(), betAmount);
+            pointClient.deductPoints(userId, BetAction.BET.name(), betAmount);
             isPointDeducted = true;
 
             // 5. 배팅 생성 및 저장 (음수로)
@@ -101,7 +99,7 @@ public class BetService {
             throw e;
         } catch (Exception e) {
             if(isPointDeducted) {
-                pointClient.addPoints(userId, betType.name(), betAmount);
+                pointClient.addPoints(userId, BetAction.BET_CANCEL.name(), betAmount);
             }
             throw new BetException(ResponseCode.INTERNAL_SERVER_ERROR);
         }
@@ -111,8 +109,7 @@ public class BetService {
      * 배팅 취소 -> 포인트 환불 시 actionType 처리
      */
     @Transactional
-    public void cancelBet(Long userId, CancelBetRequestDto dto) {
-        Long gameId = dto.getGameId();
+    public void cancelBet(Long userId, Long gameId) {
 
         // 1. Redis에서 현재 활성 배팅 확인
         String amountKey = "user:" + userId + ":game:" + gameId + ":amount";
@@ -136,7 +133,7 @@ public class BetService {
         }
 
         // 3. 취소 기록 INSERT
-        Bet cancelBet = Bet.create(userId, game, betType, totalAmount, BetAction.CANCEL);
+        Bet cancelBet = Bet.create(userId, game, betType, totalAmount, BetAction.BET_CANCEL);
         betRepository.save(cancelBet);
 
         // 4. Redis 데이터 삭제
@@ -144,7 +141,7 @@ public class BetService {
         redisTemplate.delete(typeKey);
 
         // 5. 포인트 환불 (비동기 처리)
-        BetCancelledEvent betCancelledEvent = BetCancelledEvent.of(userId, betType.name(), totalAmount);
+        BetCancelledEvent betCancelledEvent = BetCancelledEvent.of(userId, BetAction.BET_CANCEL.name(), totalAmount);
         kafkaTemplate.send("bet.cancelled", betCancelledEvent.toJson());
 
         // 6. 배팅 풀 업데이트
@@ -208,27 +205,27 @@ public class BetService {
             // 5. 결과에 따라 정산 기록 생성
             if (winningType == null) {
                 // 무승부 또는 경기 취소 -> 환불
-                Bet refund = Bet.create(userId, game, userBetType, totalBetAmount, BetAction.REFUND);
+                Bet refund = Bet.create(userId, game, userBetType, totalBetAmount, BetAction.BET_REFUND);
                 betRepository.save(refund);
                 // 원금 환불 (비동기 처리)
-                BetSettledEvent betSettledEvent = BetSettledEvent.of(userId, BetAction.CANCEL.name(), totalBetAmount);
+                BetSettledEvent betSettledEvent = BetSettledEvent.of(userId, BetAction.BET_CANCEL.name(), totalBetAmount);
                 kafkaTemplate.send("bet.settled", betSettledEvent.toJson());
                 log.info("배팅 환불: userId={}, amount={}", userId, totalBetAmount);
 
             } else if (userBetType == winningType) {
                 // 당첨
                 int rewardAmount = (int) (totalBetAmount * odds);
-                Bet win = Bet.create(userId, game, userBetType, rewardAmount, BetAction.WIN);
+                Bet win = Bet.create(userId, game, userBetType, rewardAmount, BetAction.BET_WIN);
                 betRepository.save(win);
                 // 당첨금 지급 (비동기 처리)
-                BetSettledEvent betSettledEvent = BetSettledEvent.of(userId, BetAction.WIN.name(), totalBetAmount);
+                BetSettledEvent betSettledEvent = BetSettledEvent.of(userId, BetAction.BET_WIN.name(), totalBetAmount);
                 kafkaTemplate.send("bet.settled", betSettledEvent.toJson());
 
                 log.info("배팅 당첨: userId={}, betAmount={}, reward={}, odds={}", userId, totalBetAmount, rewardAmount, odds);
 
             } else {
                 // 낙첨
-                Bet lose = Bet.create(userId, game, userBetType, 0, BetAction.LOSE);
+                Bet lose = Bet.create(userId, game, userBetType, 0, BetAction.BET_LOSE);
                 betRepository.save(lose);
                 log.info("배팅 낙첨: userId={}, betAmount={}", userId, totalBetAmount);
             }

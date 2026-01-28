@@ -8,10 +8,10 @@ import lombok.RequiredArgsConstructor;
 public enum BetAction {
 
     BET("배팅"),
-    CANCEL("취소"),
-    WIN("당첨"),
-    LOSE("낙첨"),
-    REFUND("환불");
+    BET_CANCEL("취소"),
+    BET_WIN("당첨"),
+    BET_LOSE("낙첨"),
+    BET_REFUND("환불");
 
     private final String description;
 }
