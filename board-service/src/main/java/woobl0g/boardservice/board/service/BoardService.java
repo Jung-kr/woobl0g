@@ -35,7 +35,7 @@ public class BoardService {
         Board board = Board.create(dto.getTitle(), dto.getContent(), userId);
         boardRepository.save(board);
 
-        BoardCreatedEvent boardCreatedEvent = BoardCreatedEvent.of(userId, "BOARD_CREATE");
+        BoardCreatedEvent boardCreatedEvent = BoardCreatedEvent.of(userId, "BOARD_CREATE", 10);
         kafkaTemplate.send("board.created", boardCreatedEvent.toJson());
         
         log.info("게시글 생성 완료 및 이벤트 발행: boardId={}, userId={}", board.getBoardId(), userId);
