@@ -22,20 +22,20 @@ public class PointClient {
                 .build();
     }
 
-    public void addPoints(Long userId, String actionType) {
+    public void addPoints(Long userId, String actionType, Integer amount) {
         restClient.post()
                 .uri("/internal/points/add")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(AddPointsRequestDto.of(userId, actionType))
+                .body(AddPointsRequestDto.of(userId, actionType, amount))
                 .retrieve()
                 .toBodilessEntity();
     }
 
-    public void deductPoints(Long userId, String actionType) {
+    public void deductPoints(Long userId, String actionType, Integer amount) {
         this.restClient.post()
                 .uri("/internal/points/deduct")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(DeductPointsRequestDto.of(userId, actionType))
+                .body(DeductPointsRequestDto.of(userId, actionType, amount))
                 .retrieve()
                 .onStatus(status -> status.value() == 400, ((request, response) -> {
                     throw new BetException(ResponseCode.INSUFFICIENT_POINT);

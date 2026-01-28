@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import woobl0g.gameservice.bet.client.PointClient;
@@ -13,6 +14,8 @@ import woobl0g.gameservice.bet.domain.BetType;
 import woobl0g.gameservice.bet.dto.BetResponseDto;
 import woobl0g.gameservice.bet.dto.CancelBetRequestDto;
 import woobl0g.gameservice.bet.dto.PlaceBetRequestDto;
+import woobl0g.gameservice.bet.event.BetCancelledEvent;
+import woobl0g.gameservice.bet.event.BetSettledEvent;
 import woobl0g.gameservice.bet.repository.BetRepository;
 import woobl0g.gameservice.game.domain.Game;
 import woobl0g.gameservice.game.repository.GameRepository;
@@ -34,6 +37,7 @@ public class BetService {
     private final BetRepository betRepository;
     private final GameRepository gameRepository;
     private final RedisTemplate<String, String> redisTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     /**
      * 배팅 생성 -> 보상 트랜잭션 & 포인트 차감 시 actionType 처리
@@ -81,7 +85,7 @@ public class BetService {
             }
 
             // 4. 포인트 차감 (Point Service 호출)
-            pointClient.deductPoints(userId, null);
+            pointClient.deductPoints(userId, betType.name(), betAmount);
             isPointDeducted = true;
 
             // 5. 배팅 생성 및 저장 (음수로)
@@ -97,7 +101,7 @@ public class BetService {
             throw e;
         } catch (Exception e) {
             if(isPointDeducted) {
-                pointClient.addPoints(userId, null);
+                pointClient.addPoints(userId, betType.name(), betAmount);
             }
             throw new BetException(ResponseCode.INTERNAL_SERVER_ERROR);
         }
@@ -139,8 +143,9 @@ public class BetService {
         redisTemplate.delete(amountKey);
         redisTemplate.delete(typeKey);
 
-        // 5. 포인트 환불
-        pointClient.addPoints(userId, null);
+        // 5. 포인트 환불 (비동기 처리)
+        BetCancelledEvent betCancelledEvent = BetCancelledEvent.of(userId, betType.name(), totalAmount);
+        kafkaTemplate.send("bet.cancelled", betCancelledEvent.toJson());
 
         // 6. 배팅 풀 업데이트
         oddsService.updateBettingPool(gameId, betType, -totalAmount);
@@ -205,7 +210,9 @@ public class BetService {
                 // 무승부 또는 경기 취소 -> 환불
                 Bet refund = Bet.create(userId, game, userBetType, totalBetAmount, BetAction.REFUND);
                 betRepository.save(refund);
-                pointClient.addPoints(userId, null); // 원금 환불
+                // 원금 환불 (비동기 처리)
+                BetSettledEvent betSettledEvent = BetSettledEvent.of(userId, BetAction.CANCEL.name(), totalBetAmount);
+                kafkaTemplate.send("bet.settled", betSettledEvent.toJson());
                 log.info("배팅 환불: userId={}, amount={}", userId, totalBetAmount);
 
             } else if (userBetType == winningType) {
@@ -213,7 +220,10 @@ public class BetService {
                 int rewardAmount = (int) (totalBetAmount * odds);
                 Bet win = Bet.create(userId, game, userBetType, rewardAmount, BetAction.WIN);
                 betRepository.save(win);
-                pointClient.addPoints(userId, null); // 당첨금 지급
+                // 당첨금 지급 (비동기 처리)
+                BetSettledEvent betSettledEvent = BetSettledEvent.of(userId, BetAction.WIN.name(), totalBetAmount);
+                kafkaTemplate.send("bet.settled", betSettledEvent.toJson());
+
                 log.info("배팅 당첨: userId={}, betAmount={}, reward={}, odds={}", userId, totalBetAmount, rewardAmount, odds);
 
             } else {

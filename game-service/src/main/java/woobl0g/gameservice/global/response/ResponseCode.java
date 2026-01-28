@@ -37,7 +37,8 @@ public enum ResponseCode {
     // 500 INTERNAL SERVER ERROR
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요."),
     KBO_CRAWLING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "KBO 경기 일정 크롤링 중 오류가 발생했습니다."),
-    BET_SETTLEMENT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "배팅 정산 중 오류가 발생했습니다.");
+    BET_SETTLEMENT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "배팅 정산 중 오류가 발생했습니다."),
+    JSON_SERIALIZATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "JSON 직렬화에 실패했습니다.");
 
     private final HttpStatus status;
     private final String message;
