@@ -2,13 +2,23 @@ package woobl0g.gameservice.game.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import woobl0g.gameservice.bet.domain.BetType;
+import woobl0g.gameservice.bet.service.OddsService;
 import woobl0g.gameservice.game.domain.Game;
+import woobl0g.gameservice.game.dto.GameDetailResponseDto;
+import woobl0g.gameservice.game.dto.GameResponseDto;
 import woobl0g.gameservice.game.dto.UpsertGameResponseDto;
 import woobl0g.gameservice.game.repository.GameRepository;
+import woobl0g.gameservice.global.exception.GameException;
+import woobl0g.gameservice.global.response.ResponseCode;
 import woobl0g.gameservice.kbo.dto.GameInfoDto;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,7 +28,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GameService {
 
+    private final OddsService oddsService;
     private final GameRepository gameRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
     public UpsertGameResponseDto upsertGames(List<GameInfoDto> gameInfoDtoList) {
@@ -60,5 +72,45 @@ public class GameService {
 
         log.info("게임 정보 UPSERT 완료 - 총: {}, 신규: {}, 수정: {}", gameInfoDtoList.size(), newGames.size(), modifiedCount);
         return new UpsertGameResponseDto(gameInfoDtoList.size(), newGames.size(), modifiedCount);
+    }
+
+    @Transactional(readOnly = true)
+    public List<GameResponseDto> getGamesByDate(LocalDate date, Pageable pageable) {
+        List<Game> games = gameRepository.findByDate(date, pageable);
+
+        return games.stream()
+                .map(game -> {
+                    boolean isBettingOpen = !game.isBettingClosed() && LocalDateTime.now().isAfter(game.getBettingOpenAt());
+                    return GameResponseDto.from(game, isBettingOpen);
+                })
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public GameDetailResponseDto getGameDetail(Long userId, Long gameId) {
+        // 1. 경기 조회
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new GameException(ResponseCode.GAME_NOT_FOUND));
+
+        // 2. 배당률 계산
+        Double homeWinOdds = oddsService.getCurrentOdds(gameId, BetType.HOME_WIN);
+        Double awayWinOdds = oddsService.getCurrentOdds(gameId, BetType.AWAY_WIN);
+        Double drawOdds = oddsService.getCurrentOdds(gameId, BetType.DRAW);
+
+        // 3. 내 배팅 정보 조회 (Redis)
+        String amountKey = "user:" + userId + ":game:" + gameId + ":amount";
+        String typeKey = "user:" + userId + ":game:" + gameId + ":type";
+
+        String amountStr = redisTemplate.opsForValue().get(amountKey);
+        String typeStr = redisTemplate.opsForValue().get(typeKey);
+
+        BetType myBetType = null;
+        Integer myTotalAmount = null;
+        if (amountStr != null && typeStr != null) {
+            myBetType = BetType.valueOf(typeStr);
+            myTotalAmount = Integer.parseInt(amountStr);
+        }
+
+        return GameDetailResponseDto.of(game, homeWinOdds, awayWinOdds, drawOdds, myBetType, myTotalAmount);
     }
 }

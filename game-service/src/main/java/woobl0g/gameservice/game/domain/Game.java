@@ -109,4 +109,21 @@ public class Game {
 
         return true;
     }
+
+    public LocalDateTime getBettingOpenAt() {
+        // 경기 날짜 낮 12시
+        return LocalDateTime.of(this.date, LocalTime.of(12, 0));
+    }
+
+    public LocalDateTime getBettingCloseAt() {
+        // 경기 시작 30분 전
+        if (this.time == null) return null;
+        return LocalDateTime.of(this.date, this.time).minusMinutes(30);
+    }
+
+    public boolean isBettingClosed() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime closeAt = getBettingCloseAt();
+        return closeAt != null && now.isAfter(closeAt);
+    }
 }
