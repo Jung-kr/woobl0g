@@ -19,6 +19,8 @@ springdoc:
         url: /v3/api-docs/board-service
       - name: point-service
         url: /v3/api-docs/point-service
+      - name: game-service
+        url: /v3/api-docs/game-service
     path: /swagger-ui.html
   api-docs:
     enabled: true

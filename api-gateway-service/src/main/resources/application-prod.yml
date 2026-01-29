@@ -19,11 +19,11 @@ spring:
                 - Method=POST,PATCH,DELETE
               filters:
                 - JwtAuthentication
-
             - id: board-service
               uri: ${BOARD_SERVICE_URL}
               predicates:
                 - Path=/api/boards/**
+
             - id: point-service-jwt
               uri: ${POINT_SERVICE_URL}
               predicates:
@@ -31,7 +31,6 @@ spring:
                 - Method=GET
               filters:
                 - JwtAuthentication
-
             - id: point-service-admin
               uri: ${POINT_SERVICE_URL}
               predicates:
@@ -41,11 +40,30 @@ spring:
                 - name: RoleAuthorization
                   args:
                     requiredRole: ADMIN
-
             - id: point-service
               uri: ${POINT_SERVICE_URL}
               predicates:
                 - Path=/api/points/**
+
+            - id: game-service-admin
+              uri: ${GAME_SERVICE_URL}
+              predicates:
+                - Path=/api/admin/bets/**, /api/admin/kbo/**
+              filters:
+                - JwtAuthentication
+                - name: RoleAuthorization
+                  args:
+                    requiredRole: ADMIN
+            - id: game-service-jwt
+              uri: ${GAME_SERVICE_URL}
+              predicates:
+                - Path=/api/bets/**, /api/games/*
+              filters:
+                - JwtAuthentication
+            - id: game-service
+              uri: ${GAME_SERVICE_URL}
+              predicates:
+                - Path=/api/games/**
 
             # Swagger Docs 관련 설정
             - id: user-service-docs
@@ -69,6 +87,12 @@ spring:
               filters:
                 - RewritePath=/v3/api-docs/point-service, /v3/api-docs
 
+            - id: game-service-docs
+              uri: ${GAME_SERVICE_URL}
+              predicates:
+                - Path=/v3/api-docs/game-service
+              filters:
+                - RewritePath=/v3/api-docs/game-service, /v3/api-docs
 jwt:
   secret-key: ${JWT_SECRET_KEY}
 
