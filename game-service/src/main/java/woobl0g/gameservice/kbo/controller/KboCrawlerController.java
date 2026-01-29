@@ -1,44 +1,86 @@
 package woobl0g.gameservice.kbo.controller;
 
-import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
 import woobl0g.gameservice.game.dto.UpsertGameResponseDto;
-import woobl0g.gameservice.game.service.GameService;
 import woobl0g.gameservice.global.response.ApiResponse;
-import woobl0g.gameservice.global.response.ResponseCode;
-import woobl0g.gameservice.game.domain.Game;
 import woobl0g.gameservice.kbo.dto.CrawlFullSeasonRequestDto;
 import woobl0g.gameservice.kbo.dto.CrawlScheduleRequestDto;
-import woobl0g.gameservice.kbo.dto.GameInfoDto;
-import woobl0g.gameservice.kbo.service.KboCrawlerService;
 
-import java.util.List;
+@Tag(name = "KBO Crawler [Admin]", description = "KBO 경기 일정 크롤링 관리 API")
+public interface KboCrawlerController {
 
-@RestController
-@RequestMapping("/api/admin/kbo")
-@RequiredArgsConstructor
-public class KboCrawlerController {
+    @Operation(
+            summary = "KBO 경기 일정 크롤링 (월별)",
+            description = "KBO 공식 홈페이지에서 특정 시즌의 특정 월 경기 일정을 크롤링합니다."
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "⭕ 크롤링 성공",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = UpsertGameResponseDto.class)
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "500",
+                    description = "❌ 크롤링 실패",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiResponse.class)
+                    )
+            )
+    })
+    ResponseEntity<ApiResponse<UpsertGameResponseDto>> crawlSchedule(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "크롤링 요청 정보 (시즌, 월, 시리즈 타입)",
+                    required = true,
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = CrawlScheduleRequestDto.class)
+                    )
+            )
+            @RequestBody CrawlScheduleRequestDto dto
+    );
 
-    private final GameService gameService;
-    private final KboCrawlerService kboCrawlerService;
-
-    @PostMapping("/crawl")
-    public ResponseEntity<ApiResponse<UpsertGameResponseDto>> crawlSchedule(@RequestBody CrawlScheduleRequestDto dto) {
-        List<GameInfoDto> crawledGames = kboCrawlerService.crawlSchedule(dto.getSeason(), dto.getMonth(), dto.getSeriesType());
-
-        return ResponseEntity
-                .status(ResponseCode.KBO_CRAWL_SUCCESS.getStatus())
-                .body(ApiResponse.success(ResponseCode.KBO_CRAWL_SUCCESS, gameService.upsertGames(crawledGames)));
-
-    }
-
-    @PostMapping("/crawl/full")
-    public ResponseEntity<ApiResponse<UpsertGameResponseDto>> crawlFullSeason(@RequestBody CrawlFullSeasonRequestDto dto) {
-        List<GameInfoDto> crawledGames = kboCrawlerService.crawlFullSeason(dto.getSeason(), dto.getSeriesType());
-
-        return ResponseEntity
-                .status(ResponseCode.KBO_CRAWL_SUCCESS.getStatus())
-                .body(ApiResponse.success(ResponseCode.KBO_CRAWL_SUCCESS, gameService.upsertGames(crawledGames)));
-    }
+    @Operation(
+            summary = "KBO 경기 일정 크롤링 (전체 시즌)",
+            description = "KBO 공식 홈페이지에서 특정 시즌의 전체 경기 일정을 크롤링합니다."
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "⭕ 크롤링 성공",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = UpsertGameResponseDto.class)
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "500",
+                    description = "❌ 크롤링 실패",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiResponse.class)
+                    )
+            )
+    })
+    ResponseEntity<ApiResponse<UpsertGameResponseDto>> crawlFullSeason(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "크롤링 요청 정보 (시즌, 시리즈 타입)",
+                    required = true,
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = CrawlFullSeasonRequestDto.class)
+                    )
+            )
+            @RequestBody CrawlFullSeasonRequestDto dto
+    );
 }

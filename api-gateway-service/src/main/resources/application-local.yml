@@ -45,6 +45,26 @@ spring:
               predicates:
                 - Path=/api/points/**
 
+            - id: game-service-admin
+              uri: http://localhost:8084
+              predicates:
+                - Path=/api/admin/bets/**, /api/admin/kbo/**
+              filters:
+                - JwtAuthentication
+                - name: RoleAuthorization
+                  args:
+                    requiredRole: ADMIN
+            - id: game-service-jwt
+              uri: http://localhost:8084
+              predicates:
+                - Path=/api/bets/**, /api/games/*
+              filters:
+                - JwtAuthentication
+            - id: game-service
+              uri: http://localhost:8084
+              predicates:
+                - Path=/api/games/**
+
             # Swagger Docs 관련 설정
             - id: user-service-docs
               uri: http://localhost:8080
@@ -67,6 +87,12 @@ spring:
               filters:
                 - RewritePath=/v3/api-docs/point-service, /v3/api-docs
 
+            - id: game-service-docs
+              uri: http://localhost:8084
+              predicates:
+                - Path=/v3/api-docs/game-service
+              filters:
+                - RewritePath=/v3/api-docs/game-service, /v3/api-docs
 jwt:
   secret-key: woo120-secret-1234-1234-1234-1234
 

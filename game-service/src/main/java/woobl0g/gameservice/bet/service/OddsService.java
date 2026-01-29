@@ -14,6 +14,7 @@ public class OddsService {
     private final RedisTemplate<String, String> redisTemplate;
 
     public void updateBettingPool(Long gameId, BetType betType, Integer betAmount) {
+        log.debug("배팅 풀 업데이트: gameId={}, betType={}, betAmount={}", gameId, betType, betAmount);
 
         // 1. Redis에서 해당 경기의 배팅 풀 조회
         // Key: game:456:pool:HOME_WIN,
@@ -29,6 +30,7 @@ public class OddsService {
     }
 
     public Double getCurrentOdds(Long gameId, BetType betType) {
+        log.debug("배당률 조회: gameId={}, betType={}", gameId, betType);
 
         // 1. 각 배팅 풀 조회
         Integer homeWinPool = getPool(gameId, BetType.HOME_WIN);
@@ -58,6 +60,8 @@ public class OddsService {
     }
 
     public void deleteBettingPool(Long gameId) {
+        log.debug("배팅 풀 삭제: gameId={}", gameId);
+        
         redisTemplate.delete("game:" + gameId + ":pool:HOME_WIN");
         redisTemplate.delete("game:" + gameId + ":pool:AWAY_WIN");
         redisTemplate.delete("game:" + gameId + ":pool:DRAW");
