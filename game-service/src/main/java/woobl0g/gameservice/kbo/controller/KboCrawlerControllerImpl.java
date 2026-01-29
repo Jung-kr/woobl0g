@@ -23,7 +23,7 @@ public class KboCrawlerControllerImpl implements KboCrawlerController {
     private final KboCrawlerService kboCrawlerService;
 
     @Override
-    @PostMapping("/crawl")
+    @PostMapping("/crawling-jobs")
     public ResponseEntity<ApiResponse<UpsertGameResponseDto>> crawlSchedule(
             @RequestBody CrawlScheduleRequestDto dto
     ) {
@@ -35,7 +35,7 @@ public class KboCrawlerControllerImpl implements KboCrawlerController {
     }
 
     @Override
-    @PostMapping("/crawl/full")
+    @PostMapping("/crawling-jobs/full")
     public ResponseEntity<ApiResponse<UpsertGameResponseDto>> crawlFullSeason(
             @RequestBody CrawlFullSeasonRequestDto dto
     ) {

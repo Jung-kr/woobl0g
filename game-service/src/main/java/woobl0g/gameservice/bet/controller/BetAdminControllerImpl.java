@@ -15,7 +15,7 @@ public class BetAdminControllerImpl implements BetAdminController {
     private final BetService betService;
 
     @Override
-    @PostMapping("/games/{gameId}/settle")
+    @PostMapping("/games/{gameId}/settlements")
     public ResponseEntity<ApiResponse<Void>> settleBets(
             @PathVariable Long gameId
     ) {
