@@ -76,6 +76,8 @@ public class GameService {
 
     @Transactional(readOnly = true)
     public List<GameResponseDto> getGamesByDate(LocalDate date) {
+        log.debug("날짜별 경기 목록 조회: date={}", date);
+        
         List<Game> games = gameRepository.findByDate(date);
 
         return games.stream()
@@ -88,6 +90,8 @@ public class GameService {
 
     @Transactional(readOnly = true)
     public GameDetailResponseDto getGameDetail(Long userId, Long gameId) {
+        log.debug("경기 상세 조회: userId={}, gameId={}", userId, gameId);
+        
         // 1. 경기 조회
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new GameException(ResponseCode.GAME_NOT_FOUND));

@@ -43,6 +43,8 @@ public class BetService {
      */
     @Transactional
     public void placeBet(Long userId, PlaceBetRequestDto dto, Long gameId) {
+        log.info("배팅 생성 시작: userId={}, gameId={}, betType={}, betAmount={}", userId, gameId, dto.getBetType(), dto.getBetAmount());
+        
         BetType betType = dto.getBetType();
         Integer betAmount = dto.getBetAmount();
 
@@ -95,9 +97,13 @@ public class BetService {
 
             // 7. 배팅 풀 업데이트 (배당률 계산을 위한)
             oddsService.updateBettingPool(gameId, betType, betAmount);
+            
+            log.info("배팅 생성 완료: userId={}, gameId={}, totalAmount={}", userId, gameId, totalBetAmount + betAmount);
         } catch (BetException | GameException e) {
+            log.warn("배팅 생성 실패: userId={}, gameId={}, reason={}", userId, gameId, e.getCode());
             throw e;
         } catch (Exception e) {
+            log.error("배팅 생성 중 예외 발생: userId={}, gameId={}", userId, gameId, e);
             if(isPointDeducted) {
                 pointClient.addPoints(userId, BetAction.BET_CANCEL.name(), betAmount);
             }
@@ -110,6 +116,7 @@ public class BetService {
      */
     @Transactional
     public void cancelBet(Long userId, Long gameId) {
+        log.info("배팅 취소 시도: userId={}, gameId={}", userId, gameId);
 
         // 1. Redis에서 현재 활성 배팅 확인
         String amountKey = "user:" + userId + ":game:" + gameId + ":amount";
@@ -146,6 +153,8 @@ public class BetService {
 
         // 6. 배팅 풀 업데이트
         oddsService.updateBettingPool(gameId, betType, -totalAmount);
+        
+        log.info("배팅 취소 완료 및 환불 이벤트 발행: userId={}, gameId={}, amount={}", userId, gameId, totalAmount);
     }
 
     /**
@@ -153,6 +162,8 @@ public class BetService {
      */
     @Transactional(readOnly = true)
     public List<BetResponseDto> getBets(Long userId, Pageable pageable) {
+        log.debug("사용자 배팅 내역 조회: userId={}, page={}", userId, pageable.getPageNumber());
+        
         List<Bet> bets = betRepository.findByUserId(userId, pageable);
 
         return bets.stream()
@@ -165,6 +176,8 @@ public class BetService {
      */
     @Transactional
     public void settleBets(Long gameId) {
+        log.info("배팅 정산 시작: gameId={}", gameId);
+        
         // 1. 경기 조회
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new GameException(ResponseCode.GAME_NOT_FOUND));
