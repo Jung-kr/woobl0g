@@ -1,0 +1,15 @@
+services:
+  api-gateway-service:
+    build: .
+    container_name: woobl0g-api-gateway-service
+    ports:
+      - "8000:8000"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - USER_SERVICE_URL=${USER_SERVICE_URL}
+      - BOARD_SERVICE_URL=${BOARD_SERVICE_URL}
+      - POINT_SERVICE_URL=${POINT_SERVICE_URL}
+      - GAME_SERVICE_URL=${GAME_SERVICE_URL}
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped

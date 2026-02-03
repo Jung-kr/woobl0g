@@ -1,0 +1,13 @@
+services:
+  notification-service:
+    build: .
+    container_name: woobl0g-notification-service
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped

@@ -1,0 +1,38 @@
+services:
+  user-service:
+    build: .
+    container_name: woobl0g-user-service
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - USER_DB_URL=${USER_DB_URL}
+      - USER_DB_USERNAME=${USER_DB_USERNAME}
+      - USER_DB_PASSWORD=${USER_DB_PASSWORD}
+      - USER_REDIS_HOST=user-redis
+      - USER_REDIS_PORT=6379
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - POINT_SERVICE_URL=${POINT_SERVICE_URL}
+      - API_GATEWAY_SERVICE_URL=${API_GATEWAY_SERVICE_URL}
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    depends_on:
+      user-redis:
+        condition: service_healthy
+
+  user-redis:
+    image: redis
+    container_name: woobl0g-user-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      retries: 10
+
+volumes:
+  redis-data:

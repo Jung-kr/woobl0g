@@ -41,7 +41,6 @@ public class BetService {
     /**
      * 배팅 생성 -> 보상 트랜잭션 & 포인트 차감 시 actionType 처리
      */
-    @Transactional
     public void placeBet(Long userId, PlaceBetRequestDto dto, Long gameId) {
         log.info("배팅 생성 시작: userId={}, gameId={}, betType={}, betAmount={}", userId, gameId, dto.getBetType(), dto.getBetAmount());
         
@@ -87,6 +86,7 @@ public class BetService {
             // 4. 포인트 차감 (Point Service 호출)
             pointClient.deductPoints(userId, BetAction.BET.name(), betAmount);
             isPointDeducted = true;
+            log.info("포인트 차감 완료: userId={}, amount={}", userId, betAmount);
 
             // 5. 배팅 생성 및 저장 (음수로)
             Bet bet = Bet.create(userId, game, betType, -betAmount, BetAction.BET);
@@ -97,7 +97,7 @@ public class BetService {
 
             // 7. 배팅 풀 업데이트 (배당률 계산을 위한)
             oddsService.updateBettingPool(gameId, betType, betAmount);
-            
+
             log.info("배팅 생성 완료: userId={}, gameId={}, totalAmount={}", userId, gameId, totalBetAmount + betAmount);
         } catch (BetException | GameException e) {
             log.warn("배팅 생성 실패: userId={}, gameId={}, reason={}", userId, gameId, e.getCode());
@@ -106,6 +106,7 @@ public class BetService {
             log.error("배팅 생성 중 예외 발생: userId={}, gameId={}", userId, gameId, e);
             if(isPointDeducted) {
                 pointClient.addPoints(userId, BetAction.BET_CANCEL.name(), betAmount);
+                log.info("[보상 트랜잭션] 포인트 적립 완료: userId={}, amount={}", userId, betAmount);
             }
             throw new BetException(ResponseCode.INTERNAL_SERVER_ERROR);
         }

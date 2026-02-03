@@ -1,0 +1,38 @@
+services:
+  game-service:
+    build: .
+    container_name: woobl0g-game-service
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - GAME_DB_URL=${GAME_DB_URL}
+      - GAME_DB_USERNAME=${GAME_DB_USERNAME}
+      - GAME_DB_PASSWORD=${GAME_DB_PASSWORD}
+      - GAME_REDIS_HOST=game-redis
+      - GAME_REDIS_PORT=6379
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - POINT_SERVICE_URL=${POINT_SERVICE_URL}
+      - API_GATEWAY_SERVICE_URL=${API_GATEWAY_SERVICE_URL}
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    depends_on:
+      game-redis:
+        condition: service_healthy
+
+  game-redis:
+    image: redis
+    container_name: woobl0g-game-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      retries: 10
+
+volumes:
+  redis-data:
