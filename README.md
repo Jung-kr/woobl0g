@@ -6,15 +6,19 @@
 
 마이크로서비스 아키텍처(MSA), 이벤트 기반 비동기 처리(Kafka), Redis 기반 실시간 배당률 계산, 대규모 트래픽을 고려한 성능 개선 등 **운영 환경을 가정**한 아키텍처 설계와 구현에 중점을 두었습니다.
 
+<br>
+
 ## 🏗️ 시스템 아키텍처
 
-<img width="4296" height="2781" alt="woobl0g_architecture" src="https://github.com/user-attachments/assets/90adb948-ffb2-47f9-a6a9-3e2ee083e982" />
+<img width="4296" height="2781" alt="woobl0g_architecture" src="https://github.com/user-attachments/assets/35f4582a-20c7-43ad-be66-16b7ba7b0fca" />
 
 - AWS **VPC 기반** 네트워크 아키텍처로 Public / Private Subnet 분리 구성
 - Bastion Host + Spring Cloud Gateway를 통한 **단일 진입점 및 운영 접근 통제**
 - Private Subnet 내부 서비스는 **NAT Gateway**를 통한 **단방향 외부 통신**만 허용
 - Kafka 기반 **비동기 이벤트 처리 구조**로 서비스 간 결합도 최소화 및 확장성 확보
 - 마이크로서비스별 **독립 RDS 구성**으로 장애 전파 최소화 및 데이터 종속성 제거
+
+<br>
 
 ## 🛠 기술 스택
 
@@ -26,6 +30,8 @@
 | Cache       | Redis                                            |
 | Infra       | AWS, Docker, Apache Kafka                        |
 | Test & Docs | JUnit5, Mockito, Swagger                         |
+
+<br>
 
 ## 🚀 핵심 구현 내용
 
@@ -58,16 +64,26 @@
 
 - 포인트 차감 → 베팅 기록 저장 구조에서 발생하던 분산 트랜잭션 불일치 문제 해결
 - 실패 발생 시 보상 트랜잭션(차감 → 재적립) 기반 최종적 일관성 확보  
-  👉 **_MSA 환경에서도 서비스 간 원자성 보장 + 장애 복구 가능 구조 완성_**
+   👉 **_MSA 환경에서도 서비스 간 원자성 보장 + 장애 복구 가능 구조 완성_**
+
+<br>
 
 ## 🗄️ ERD
 
-[erd 사진]
+![erd](./docs/erd.png)
+
+- 핵심 엔티티 설명
+- 테이블 설계 이유
+- 정규화 / 반정규화 전략
+
+<br>
+
 ## 📡 API 명세
 
-- Swagger: `http://localhost:8000/swagger-ui/index.html`
+**Swagger :** `http://localhost:8000/swagger-ui/index.html`
 
-**🔐 user-service**
+<details>
+<summary><b>🔐 user-service</b></summary>
 
 | Method | URL                        | Description      | Note                                                                                                |
 | ------ | -------------------------- | ---------------- | --------------------------------------------------------------------------------------------------- |
@@ -77,7 +93,10 @@
 | GET    | `/internal/users/{userId}` | 단일 사용자 조회 | -                                                                                                   |
 | GET    | `/internal/users`          | 다중 사용자 조회 | -                                                                                                   |
 
-**📝 board-service**
+</details>
+
+<details>
+<summary><b>📝 board-service</b></summary>
 
 | Method | URL                                          | Description      | Note                                                      |
 | ------ | -------------------------------------------- | ---------------- | --------------------------------------------------------- |
@@ -91,7 +110,10 @@
 | PATCH  | `/api/boards/{boardId}/comments/{commentId}` | 댓글 수정        | -                                                         |
 | DELETE | `/api/boards/{boardId}/comments/{commentId}` | 댓글 삭제        | 대댓글 존재 시 Soft Delete                                |
 
-**🎮 game-service**
+</details>
+
+<details>
+<summary><b>🎮 game-service</b></summary>
 
 | Method | URL                                          | Description                 | Note                                                      |
 | ------ | -------------------------------------------- | --------------------------- | --------------------------------------------------------- |
@@ -104,7 +126,10 @@
 | POST   | `/api/admin/kbo/crawling-jobs/full`          | KBO 일정 크롤링 (전체 시즌) | -                                                         |
 | POST   | `/api/admin/bets/games/{gameId}/settlements` | 배팅 정산                   | Kafka 이벤트 발행 <br> → `point-service` 포인트 자동 적립 |
 
-**💰 point-service**
+</details>
+
+<details>
+<summary><b>💰 point-service</b></summary>
 | Method | URL | Description | Note |
 |--------|------|--------------|------|
 | GET | `/api/points/ranking` | 포인트 랭킹 조회 | `user-service` 사용자 정보 배치 조회 |
@@ -114,10 +139,13 @@
 | GET | `/api/admin/points/failures` | 포인트 적립 실패 내역 조회 | - |
 | POST | `/api/admin/points/failures/{failureId}/retry` | 실패 적립 재시도 | - |
 | POST | `/api/admin/points/failures/{failureId}/ignore` | 실패 적립 무시 처리 | - |
+</details>
+
+<br>
 
 ## 🚀 배포 및 실행 방법
 
-### 로컬 환경
+**로컬 환경**
 
 ```bash
 # 저장소 클론
