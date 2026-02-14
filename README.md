@@ -49,7 +49,7 @@
 
 **3️⃣ 이벤트 기반 데이터 동기화로 게시글 조회 성능 개선**
 
-- 게시글 조회 시 발생하던 서비스 간 동기 호출 + N+1 구조 제거ㅌ
+- 게시글 조회 시 발생하던 서비스 간 동기 호출 및 N+1 구조 제거
 - Kafka 기반 사용자 정보 변경 이벤트 발행 → board-service 비동기 동기화 구조 설계
 - 조회 전용 User 테이블 구성으로 게시글 조회 시 user-service 호출 완전 제거  
   👉 **_응답 시간 328ms → 118ms (64% 단축), 동기 호출 제거로 장애 전파 차단_**
@@ -70,11 +70,14 @@
 
 ## 🗄️ ERD
 
-![erd](./docs/erd.png)
+<img width="1400" height="767" alt="woobl0g_erd" src="https://github.com/user-attachments/assets/357aee61-8a63-4f11-9cab-6cc29c7c2043" />
 
-- 핵심 엔티티 설명
-- 테이블 설계 이유
-- 정규화 / 반정규화 전략
+본 프로젝트는 **MSA** 기반으로, 도메인별 책임을 명확히 분리하기 위해 서비스 단위로 **독립적인 DB를 분리**하여 설계하였습니다.
+
+- 🟢 **user-service** : 회원 관리, 인증/인가, 사용자 기본 정보 관리  
+- 🟠 **board-service** : 게시글, 댓글, 사용자 게시판 활동 관리  
+- 🟡 **game-service** : 경기 정보 관리, 베팅 처리, 게임 상태 관리  
+- 🔵 **point-service** : 포인트 적립/차감, 포인트 변경 이력, 실패 이력 관리  
 
 <br>
 
@@ -130,6 +133,7 @@
 
 <details>
 <summary><b>💰 point-service</b></summary>
+  
 | Method | URL | Description | Note |
 |--------|------|--------------|------|
 | GET | `/api/points/ranking` | 포인트 랭킹 조회 | `user-service` 사용자 정보 배치 조회 |
@@ -139,6 +143,7 @@
 | GET | `/api/admin/points/failures` | 포인트 적립 실패 내역 조회 | - |
 | POST | `/api/admin/points/failures/{failureId}/retry` | 실패 적립 재시도 | - |
 | POST | `/api/admin/points/failures/{failureId}/ignore` | 실패 적립 무시 처리 | - |
+  
 </details>
 
 <br>
